@@ -17,5 +17,5 @@ WebFontConfig = {
 };
 
 zelda.game.state.add('main', zelda.menu);
-zelda.game.state.add('level1', zelda.level1);
+zelda.game.state.add('casa_link', zelda.casa_link);
 zelda.game.state.start('main');
