@@ -1,8 +1,8 @@
 var zelda = zelda || {};
 
-zelda.level1 = {
+zelda.casa_link = {
     
-    init:function(){
+    init:function(){ 
         
         
         
