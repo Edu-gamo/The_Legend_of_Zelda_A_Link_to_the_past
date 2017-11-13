@@ -9,16 +9,27 @@ zelda.level1 = {
     },
     
     preload:function(){
+        //background
+        this.load.image('bg','img/link_house.png');
         //walk spritesheets
         this.load.spritesheet('linkWalk_noShield','img/link_normal_walk_spritesheet.png',23.28,29); this.load.spritesheet('linkWalk_Shield','img/link_shield_walk_spritesheet.png',23.28,29);
         //attack spritesheets
         this.load.spritesheet('attack_front','img/link_ataque_basico_frontal_spritesheet.png',39.83,40);
         this.load.spritesheet('attack_right','img/link_ataque_basico_lateral_spritesheet.png',40,60);
         this.load.spritesheet('attack_back','img/link_ataque_basico_trasero_spritesheet.png',40,60);
+        //house objects
+        this.load.image('mesa','img/mesa.png');
+        this.load.image('silla','img/silla.png');
+        this.load.image('gerro','img/gerro.png');
+        this.load.image('cofre','img/cofre.png');
+        
                
     },
     
     create:function(){
+        //Bg
+        bg = zelda.game.add.sprite(0,0,'bg');
+        bg.scale.setTo(2);
         //Link
         link = zelda.game.add.sprite(0,0,'linkWalk_noShield',3);
         //link.anchor.setTo(.5);
@@ -38,6 +49,23 @@ zelda.level1 = {
         cursors = zelda.game.input.keyboard.createCursorKeys();
         xKey = zelda.game.input.keyboard.addKey(Phaser.Keyboard.X);
         xKey.onDown.add(zelda.level1.xKeyPressed,this);
+        
+        //house level
+        //s = silla. m = mesa, c = cofre, g=gerro
+        this.level = [
+            'XXXXXXXXXXXXX',
+            'Xg          X',
+            'Xg          X',
+            'Xg          X',
+            'X           X',
+            'X           X',
+            'X           X',
+            'X           X',
+            'X           X',
+            'X           X',
+            'XXXXXXXXXXXXX'           
+        ];
+        
     },
     
     update:function(){
@@ -69,6 +97,7 @@ zelda.level1 = {
         if(link.attacking){
             link.body.velocity.set(0);
             link.animations.stop(true);
+            link.visible = false;
             //link sprite invisible
             
         }
@@ -114,6 +143,7 @@ zelda.level1 = {
     
     endAttack:function(){
         link.attacking = false;
+        link.visible = true;
     }
     
 };
