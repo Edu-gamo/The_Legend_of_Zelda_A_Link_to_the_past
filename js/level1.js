@@ -4,7 +4,7 @@ zelda.level1 = {
     
     init:function(){
         
-        
+        this.game.world.setBounds(0, 0, gameOptions.gameWidth, gameOptions.gameHeight);
         
     },
     
@@ -30,7 +30,8 @@ zelda.level1 = {
         //Bg
         bg = zelda.game.add.sprite(0,0,'bg');
         bg.scale.setTo(2);
-        //Link
+        
+        /*//Link
         link = zelda.game.add.sprite(0,0,'linkWalk_noShield',3);
         //link.anchor.setTo(.5);
         link.scale.setTo(2);
@@ -42,13 +43,13 @@ zelda.level1 = {
         link.animations.add('linkWalk_front',[0,1,2,3,4,5,6,5,4,3,2,1],30,true);
         link.animations.add('linkWalk_back',[7,8,9,10,11,12,13,12,11,10,9,8],30,true);
         link.animations.add('linkWalk_right',[14,15,16,17,18,19,20,19,18,17,16,15],30,true);
-        link.animations.add('linkWalk_left',[21,22,23,24,25,26,27,26,25,24,23,22],30,true);
+        link.animations.add('linkWalk_left',[21,22,23,24,25,26,27,26,25,24,23,22],30,true);*/
 
         
         //control keys
         cursors = zelda.game.input.keyboard.createCursorKeys();
         xKey = zelda.game.input.keyboard.addKey(Phaser.Keyboard.X);
-        xKey.onDown.add(zelda.level1.xKeyPressed,this);
+        //xKey.onDown.add(zelda.level1.xKeyPressed,this);
         
         //house level
         //s = silla. m = mesa, c = cofre, g=gerro
@@ -67,20 +68,20 @@ zelda.level1 = {
         ];
         
         
-        /*
+        
         //Link prefab
         this.link = new zelda.link_prefab(this.game, 100, 100, this);
-        this.game.add.existing(this.link);*/
+        this.game.add.existing(this.link);
         
     },
     
     update:function(){
         
         //Link prefab movement
-        //this.link.movement(cursors);
+        this.link.movement(cursors);
         
         //movement   
-        link.body.velocity.set(0);
+        /*link.body.velocity.set(0);
         if(cursors.down.isDown){
             link.body.velocity.y = gameOptions.linkSpeed;
             link.animations.play('linkWalk_front');
@@ -108,9 +109,9 @@ zelda.level1 = {
             link.visible = false;
             //link sprite invisible
             
-        }
+        }*/
         
-    },
+    }/*,
     
     xKeyPressed:function(){
         
@@ -152,7 +153,7 @@ zelda.level1 = {
     endAttack:function(){
         link.attacking = false;
         link.visible = true;
-    }
+    }*/
     
 };
 /*

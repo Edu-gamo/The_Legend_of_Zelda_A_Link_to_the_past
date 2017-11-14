@@ -8,6 +8,7 @@ zelda.link_prefab = function(game, x, y, level){
     this.scale.setTo(2);
     
     game.physics.arcade.enable(this);
+    this.body.collideWorldBounds = true;
     
     this.direction = 3; //front=3,back=10,right=17,left=24;
     this.hasWeapon = false;
@@ -43,10 +44,10 @@ zelda.link_prefab.prototype.movement = function(cursors){
     //Vertical Axis Movement
     if(cursors.down.isDown){
         this.body.velocity.y = gameOptions.linkSpeed;
-        if(this.body.velocity.x == 0) this.direction = 3;
+        if(this.body.velocity.x == 0 || this.direction == 10) this.direction = 3;
     } else if(cursors.up.isDown){
         this.body.velocity.y = -gameOptions.linkSpeed;
-        if(this.body.velocity.x == 0) this.direction = 10;
+        if(this.body.velocity.x == 0 || this.direction == 3) this.direction = 10;
     }else{
         this.body.velocity.y = 0;
     }
@@ -54,10 +55,10 @@ zelda.link_prefab.prototype.movement = function(cursors){
     //Horizontal Axis Movement
     if(cursors.right.isDown){
         this.body.velocity.x = gameOptions.linkSpeed;
-        if(this.body.velocity.y == 0) this.direction = 17;
+        if(this.body.velocity.y == 0 || this.direction == 24) this.direction = 17;
     }else if(cursors.left.isDown){
         this.body.velocity.x = -gameOptions.linkSpeed;
-        if(this.body.velocity.y == 0) this.direction = 24;
+        if(this.body.velocity.y == 0 || this.direction == 17) this.direction = 24;
     }else{
         this.body.velocity.x = 0;
     }
