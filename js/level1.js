@@ -66,10 +66,18 @@ zelda.level1 = {
             'XXXXXXXXXXXXX'           
         ];
         
+        
+        /*
+        //Link prefab
+        this.link = new zelda.link_prefab(this.game, 100, 100, this);
+        this.game.add.existing(this.link);*/
+        
     },
     
     update:function(){
         
+        //Link prefab movement
+        //this.link.movement(cursors);
         
         //movement   
         link.body.velocity.set(0);
