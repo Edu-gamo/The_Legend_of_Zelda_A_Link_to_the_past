@@ -13,6 +13,8 @@ zelda.link_prefab = function(game, x, y, level){
     this.direction = 3; //front=3,back=10,right=17,left=24;
     this.hasWeapon = false;
     this.attacking = false;
+    
+    game.load.spritesheet('linkWalk_Shield','img/link_shield_walk_spritesheet.png',23.28,29);
     //if(this.hasWeapon) this.loadTexture('linkWalk_Shield');
     
     this.animations.add('linkWalk_front',[0,1,2,3,4,5,6,5,4,3,2,1],30,true);
@@ -20,7 +22,16 @@ zelda.link_prefab = function(game, x, y, level){
     this.animations.add('linkWalk_right',[14,15,16,17,18,19,20,19,18,17,16,15],30,true);
     this.animations.add('linkWalk_left',[21,22,23,24,25,26,27,26,25,24,23,22],30,true);
     
+    //attack spritesheets
+    game.load.spritesheet('attack_front','img/link_ataque_basico_frontal_spritesheet.png',39.83,40);
+    game.load.spritesheet('attack_right','img/link_ataque_basico_lateral_spritesheet.png',40,60);
+    game.load.spritesheet('attack_back','img/link_ataque_basico_trasero_spritesheet.png',40,60);
+    
+    this.game = game;
     this.level = level
+    
+    this.cursors = game.input.keyboard.createCursorKeys();
+    this.xKey = game.input.keyboard.addKey(Phaser.Keyboard.X);
     
 };
 
@@ -37,15 +48,18 @@ zelda.link_prefab.prototype.update = function(){
     this.game.physics.arcade.collide(this, this.level.objects);
     */
     
+    if(!this.attacking) this.movement();
+    if(this.xKey.isDown && this.xKey.downDuration(1)) this.attack();
+    
 }
 
-zelda.link_prefab.prototype.movement = function(cursors){
+zelda.link_prefab.prototype.movement = function(){
     
     //Vertical Axis Movement
-    if(cursors.down.isDown){
+    if(this.cursors.down.isDown){
         this.body.velocity.y = gameOptions.linkSpeed;
         if(this.body.velocity.x == 0 || this.direction == 10) this.direction = 3;
-    } else if(cursors.up.isDown){
+    } else if(this.cursors.up.isDown){
         this.body.velocity.y = -gameOptions.linkSpeed;
         if(this.body.velocity.x == 0 || this.direction == 3) this.direction = 10;
     }else{
@@ -53,10 +67,10 @@ zelda.link_prefab.prototype.movement = function(cursors){
     }
     
     //Horizontal Axis Movement
-    if(cursors.right.isDown){
+    if(this.cursors.right.isDown){
         this.body.velocity.x = gameOptions.linkSpeed;
         if(this.body.velocity.y == 0 || this.direction == 24) this.direction = 17;
-    }else if(cursors.left.isDown){
+    }else if(this.cursors.left.isDown){
         this.body.velocity.x = -gameOptions.linkSpeed;
         if(this.body.velocity.y == 0 || this.direction == 17) this.direction = 24;
     }else{
@@ -83,5 +97,42 @@ zelda.link_prefab.prototype.movement = function(cursors){
                 break;
         }
     }
+    
+}
+
+zelda.link_prefab.prototype.attack = function(){
+    
+    this.attacking = true;
+    this.body.velocity.setTo(0, 0);
+    this.animations.stop(true);
+    this.visible = false;
+    
+    var sprAttack;
+    
+    switch(this.direction){
+        case 3:
+            sprAttack = this.game.add.sprite(this.body.center.x,this.body.center.y,'attack_front');
+            break;
+        
+        case 10:
+            sprAttack = this.game.add.sprite(this.body.center.x,this.body.center.y,'attack_back');
+            break;
+        
+        case 17:
+        case 24:
+            sprAttack = this.game.add.sprite(this.body.center.x,this.body.center.y,'attack_right');
+            break;
+            
+    }
+    
+    var animAttack = this.direction == 10 ? sprAttack.animations.add('shortAttack',[0,1,2,3,4,5,6,7,8]) : sprAttack.animations.add('shortAttack',[0,1,2,3,4,5]);
+    sprAttack.scale.setTo(2);
+    if(this.direction == 24) sprAttack.scale.x *= -1;
+    sprAttack.anchor.setTo(.5);
+    sprAttack.animations.play('shortAttack',50,false, true);
+    animAttack.onComplete.add(function(){
+        this.attacking = false;
+        this.visible = true;
+    }, this);
     
 }
