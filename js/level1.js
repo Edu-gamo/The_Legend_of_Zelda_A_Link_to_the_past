@@ -23,6 +23,11 @@ zelda.level1 = {
         this.load.image('gerro','img/gerro.png');
         this.load.image('cofre','img/cofre.png');
         
+        //attack spritesheets
+        zelda.game.load.spritesheet('attack_front','img/link_ataque_basico_frontal_spritesheet.png',39.83,40);
+        zelda.game.load.spritesheet('attack_right','img/link_ataque_basico_lateral_spritesheet.png',40,60);
+        zelda.game.load.spritesheet('attack_back','img/link_ataque_basico_trasero_spritesheet.png',40,60);
+        
     },
     
     create:function(){

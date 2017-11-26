@@ -22,10 +22,10 @@ zelda.link_prefab = function(game, x, y, level){
     this.animations.add('linkWalk_right',[14,15,16,17,18,19,20,19,18,17,16,15],30,true);
     this.animations.add('linkWalk_left',[21,22,23,24,25,26,27,26,25,24,23,22],30,true);
     
-    //attack spritesheets
+    /*//attack spritesheets
     game.load.spritesheet('attack_front','img/link_ataque_basico_frontal_spritesheet.png',39.83,40);
     game.load.spritesheet('attack_right','img/link_ataque_basico_lateral_spritesheet.png',40,60);
-    game.load.spritesheet('attack_back','img/link_ataque_basico_trasero_spritesheet.png',40,60);
+    game.load.spritesheet('attack_back','img/link_ataque_basico_trasero_spritesheet.png',40,60);*/
     
     this.game = game;
     this.level = level
@@ -36,7 +36,7 @@ zelda.link_prefab = function(game, x, y, level){
 };
 
 zelda.link_prefab.prototype = Object.create(Phaser.Sprite.prototype);
-zelda.link_prefab.prototype.constructor = zelda.link_prefab;
+//zelda.link_prefab.prototype.constructor = zelda.link_prefab;
 
 zelda.link_prefab.prototype.update = function(){
     
@@ -48,9 +48,10 @@ zelda.link_prefab.prototype.update = function(){
     this.game.physics.arcade.collide(this, this.level.objects);
     */
     
-    if(!this.attacking) this.movement();
-    if(this.xKey.isDown && this.xKey.downDuration(1)) this.attack();
-    
+    if(!this.attacking){
+        this.movement();
+        if(this.xKey.isDown && this.xKey.downDuration(1)) this.attack();
+    }
 }
 
 zelda.link_prefab.prototype.movement = function(){
@@ -97,6 +98,7 @@ zelda.link_prefab.prototype.movement = function(){
                 break;
         }
     }
+
     
 }
 
