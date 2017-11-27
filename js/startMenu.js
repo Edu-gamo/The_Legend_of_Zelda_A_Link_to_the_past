@@ -12,7 +12,8 @@ zelda.menu = {
         zelda.game.load.image('mainMenu','img/mainMenu_image.png');
         zelda.game.load.image('playerSelection','img/playerSelectMenu_bg.png');
         zelda.game.load.image('playerRegister','img/registerMenu_bg.png');
-        
+        //intro video
+        zelda.game.load.video('introScreen','img/introVideo.mp4');
         
     },
     
@@ -30,18 +31,19 @@ zelda.menu = {
         
         enter.onDown.add(zelda.menu.changeMenuScreen,this);
         
+        //main screen and intro
+        this.intro = this.game.add.video('introScreen');
+        var introSprite = this.intro.addToWorld(this.game.width/2, this.game.height/2,0.5,0.5,0.5,0.5);
+        this.intro.play(true);
     },
     
     update:function(){
         switch(menuState){
-            case 'main':
-                //main menu animated
-                bg_img = zelda.game.add.image(0,0,'mainMenu');
-                bg_img.scale.setTo(2);
-                
-                //if(X seconds in time) video;
+            case 'main':                
+                //if(key pressed) goTo SELECT;
                 break;
             case 'select':
+                this.intro.stop();
                 bg_img = zelda.game.add.image(0,0,'playerSelection');
                 bg_img.scale.setTo(2);
                 break;

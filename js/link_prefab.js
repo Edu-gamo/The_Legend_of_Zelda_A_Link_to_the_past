@@ -3,7 +3,6 @@ var zelda = zelda || {};
 zelda.link_prefab = function(game, x, y, level){
     
     Phaser.Sprite.call(this, game, x, y, 'linkWalk_noShield');
-    
     this.anchor.setTo(.5);
     this.scale.setTo(2);
     
@@ -13,25 +12,36 @@ zelda.link_prefab = function(game, x, y, level){
     this.direction = 3; //front=3,back=10,right=17,left=24;
     this.hasWeapon = false;
     this.attacking = false;
+    this.itemSelected = 0; //lantern=1, boomerang=2, bomb=3
+    this.hearts = 3;
+    this.health = 6; //cada enter es mig cor
+    this.magic = 16; //de 0 a 16
+    this.rupees = 0;
+    this.bombs = 0;
+    this.arrows = 0;
+    this.keys = 0;
     
-    game.load.spritesheet('linkWalk_Shield','img/link_shield_walk_spritesheet.png',23.28,29);
-    //if(this.hasWeapon) this.loadTexture('linkWalk_Shield');
+    //game.load.spritesheet('linkWalk_Shield','img/link_shield_walk_spritesheet.png',23.28,29);
+    if(this.hasWeapon) this.loadTexture('linkWalk_Shield'); //canviarho a un overlap amb les armes
     
     this.animations.add('linkWalk_front',[0,1,2,3,4,5,6,5,4,3,2,1],30,true);
     this.animations.add('linkWalk_back',[7,8,9,10,11,12,13,12,11,10,9,8],30,true);
     this.animations.add('linkWalk_right',[14,15,16,17,18,19,20,19,18,17,16,15],30,true);
     this.animations.add('linkWalk_left',[21,22,23,24,25,26,27,26,25,24,23,22],30,true);
     
-    /*//attack spritesheets
-    game.load.spritesheet('attack_front','img/link_ataque_basico_frontal_spritesheet.png',39.83,40);
-    game.load.spritesheet('attack_right','img/link_ataque_basico_lateral_spritesheet.png',40,60);
-    game.load.spritesheet('attack_back','img/link_ataque_basico_trasero_spritesheet.png',40,60);*/
+    //this.game = game;
+    //this.level = level
     
-    this.game = game;
-    this.level = level
+    game.camera.follow(this,Phaser.Camera.FOLLOW_LOCKON);
     
+    //INPUT
     this.cursors = game.input.keyboard.createCursorKeys();
-    this.xKey = game.input.keyboard.addKey(Phaser.Keyboard.X);
+    this.zKey = game.input.keyboard.addKey(Phaser.Keyboard.Z); //interactuar
+    this.xKey = game.input.keyboard.addKey(Phaser.Keyboard.X); //atacar
+    this.aKey = game.input.keyboard.addKey(Phaser.Keyboard.A); //mapa
+    this.sKey = game.input.keyboard.addKey(Phaser.Keyboard.S); //inventari
+    
+    
     
 };
 
