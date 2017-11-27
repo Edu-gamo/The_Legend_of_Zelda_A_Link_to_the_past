@@ -28,6 +28,8 @@ zelda.level1 = {
         this.load.image('gerro','img/gerro.png');
         this.load.image('cofre','img/cofre.png');
         
+        this.load.image('wall','img/invisible_wall.png');
+        
         //this.load.image('bg', 'cuadroOtono.jpg'); //mapa fondo
         
         //HUD sprites
@@ -50,16 +52,78 @@ zelda.level1 = {
         this.level = [
             'XXXXXXXXXXXXX',
             'Xg          X',
-            'Xg          X',
-            'Xg          X',
+            'Xg       s  X',
+            'Xg      M   X',
             'X           X',
+            'X        s cX',
+            'X m         X',
             'X           X',
-            'X           X',
-            'X           X',
-            'X           X',
-            'X           X',
-            'XXXXXXXXXXXXX'           
+            'XXXXXL RXXXXX'           
         ];
+        
+        this.objects = this.game.add.group();
+        this.walls = this.game.add.group();
+        for(var i = 0; i < this.level.length; i++){
+            for(var j = 0; j < this.level[i].length; j++){
+                switch(this.level[i][j]){
+                    case 'X':
+                        wall = this.game.add.sprite(32*j+16, 32*i+16, 'wall');
+                        wall.scale.setTo(2);
+                        this.game.physics.arcade.enable(wall);
+                        wall.body.immovable = true;
+                        this.walls.add(wall);
+                        break;
+                    case 'L':
+                        wall = this.game.add.sprite(32*j+16, 32*i+16, 'wall');
+                        wall.scale.y = 2
+                        this.game.physics.arcade.enable(wall);
+                        wall.body.immovable = true;
+                        this.walls.add(wall);
+                        break;
+                    case 'R':
+                        wall = this.game.add.sprite(32*j+32, 32*i+16, 'wall');
+                        wall.scale.y = 2
+                        this.game.physics.arcade.enable(wall);
+                        wall.body.immovable = true;
+                        this.walls.add(wall);
+                        break;
+                    case 's':
+                        silla = this.game.add.sprite(32*j+16, 32*i+16, 'silla');
+                        silla.scale.setTo(1.75);
+                        this.game.physics.arcade.enable(silla);
+                        silla.body.immovable = true;
+                        this.walls.add(silla);
+                        break;
+                    case 'M':
+                        mesa = this.game.add.sprite(32*j+16, 32*i+16, 'mesa');
+                        mesa.scale.setTo(1.75);
+                        this.game.physics.arcade.enable(mesa);
+                        mesa.body.immovable = true;
+                        this.walls.add(mesa);
+                        break;
+                    case 'm':
+                        mesa = this.game.add.sprite(32*j+16, 32*i+16, 'mesa');
+                        this.game.physics.arcade.enable(mesa);
+                        mesa.body.immovable = true;
+                        this.walls.add(mesa);
+                        break;
+                    case 'c':
+                        cofre = this.game.add.sprite(32*j+16, 32*i+16, 'cofre');
+                        cofre.scale.setTo(1.75);
+                        this.game.physics.arcade.enable(cofre);
+                        cofre.body.immovable = true;
+                        this.walls.add(cofre);
+                        break;
+                    case 'g':
+                        gerro = this.game.add.sprite(32*j+16, 32*i+16, 'gerro');
+                        gerro.scale.setTo(2);
+                        this.game.physics.arcade.enable(gerro);
+                        gerro.body.immovable = true;
+                        this.objects.add(gerro);
+                        break;
+                }
+            }
+        }
         
         //Link prefab
         this.link = new zelda.link_prefab(this.game, 100, 100, this);

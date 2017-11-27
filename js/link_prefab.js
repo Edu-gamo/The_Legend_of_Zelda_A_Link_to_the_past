@@ -30,7 +30,7 @@ zelda.link_prefab = function(game, x, y, level){
     this.animations.add('linkWalk_left',[21,22,23,24,25,26,27,26,25,24,23,22],30,true);
     
     //this.game = game;
-    //this.level = level
+    this.level = level
     
     game.camera.follow(this,Phaser.Camera.FOLLOW_LOCKON);
     
@@ -50,13 +50,12 @@ zelda.link_prefab.prototype = Object.create(Phaser.Sprite.prototype);
 
 zelda.link_prefab.prototype.update = function(){
     
-    /*
+    
     //Collide with walls
     this.game.physics.arcade.collide(this, this.level.walls);
     
     //Collide with objects
     this.game.physics.arcade.collide(this, this.level.objects);
-    */
     
     if(!this.attacking){
         this.movement();
