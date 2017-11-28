@@ -48,7 +48,7 @@ zelda.level1 = {
         bg.scale.setTo(2);
         
         //house level
-        //s = silla. m = mesa, c = cofre, g=gerro
+        //s = silla, m = mesa pequeña, M = mesa grande, c = cofre, g=gerro, X = muro, L i R = muro puerta, e = exit
         this.level = [
             'XXXXXXXXXXXXX',
             'Xg          X',
@@ -58,11 +58,13 @@ zelda.level1 = {
             'X        s cX',
             'X m         X',
             'X           X',
-            'XXXXXL RXXXXX'           
+            'XXXXXL RXXXXX',
+            '     eee     '
         ];
         
         this.objects = this.game.add.group();
         this.walls = this.game.add.group();
+        this.exit = this.game.add.group();
         for(var i = 0; i < this.level.length; i++){
             for(var j = 0; j < this.level[i].length; j++){
                 switch(this.level[i][j]){
@@ -120,6 +122,13 @@ zelda.level1 = {
                         this.game.physics.arcade.enable(gerro);
                         gerro.body.immovable = true;
                         this.objects.add(gerro);
+                        break;
+                    case 'e':
+                        out = this.game.add.sprite(32*j+16, 32*i+32, 'wall');
+                        out.scale.setTo(2);
+                        this.game.physics.arcade.enable(out);
+                        out.body.immovable = true;
+                        this.exit.add(out);
                         break;
                 }
             }

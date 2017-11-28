@@ -57,6 +57,11 @@ zelda.link_prefab.prototype.update = function(){
     //Collide with objects
     this.game.physics.arcade.collide(this, this.level.objects);
     
+    //Overlap with exit
+    this.game.physics.arcade.overlap(this, this.level.exit, function(){
+        zelda.game.state.start('main');
+    });
+    
     if(!this.attacking){
         this.movement();
         if(this.xKey.isDown && this.xKey.downDuration(1)) this.attack();
