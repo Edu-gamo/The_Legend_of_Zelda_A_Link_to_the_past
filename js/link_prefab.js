@@ -7,7 +7,7 @@ zelda.link_prefab = function(game, x, y, level){
     this.scale.setTo(2);
     
     game.physics.arcade.enable(this);
-    this.body.collideWorldBounds = true;
+    //this.body.collideWorldBounds = true;
     
     this.direction = 3; //front=3,back=10,right=17,left=24;
     this.hasWeapon = false;
@@ -84,7 +84,7 @@ zelda.link_prefab.prototype.update = function(){
     
     //Overlap with exit
     this.game.physics.arcade.overlap(this, this.level.exit, function(){
-        zelda.game.state.start('main');
+        zelda.game.state.start('world');
     });
 }
 
