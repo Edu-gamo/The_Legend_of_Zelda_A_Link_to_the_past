@@ -121,6 +121,7 @@ zelda.level1 = {
                         gerro.scale.setTo(2);
                         this.game.physics.arcade.enable(gerro);
                         gerro.body.immovable = true;
+                        gerro.state = 0; //0 = en suelo, 1 = recogido, 2 = lanzado
                         this.objects.add(gerro);
                         break;
                     case 'e':
