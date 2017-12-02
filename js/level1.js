@@ -6,6 +6,9 @@ zelda.level1 = {
         
         this.game.world.setBounds(-200, -200, gameOptions.gameWidth+200, gameOptions.gameHeight+200); //depen del fondo
         
+        this.scale.setUserScale(2,2);
+        this.scale.scaleMode = Phaser.ScaleManager.USER_SCALE; //or SHOW_ALL
+        
     },
     
     preload:function(){
@@ -30,8 +33,6 @@ zelda.level1 = {
         
         this.load.image('wall','img/invisible_wall.png');
         
-        //this.load.image('bg', 'cuadroOtono.jpg'); //mapa fondo
-        
         //HUD sprites
         this.load.spritesheet('HUD','img/HUD_2types.png',256,224);
         this.load.spritesheet('items','img/items.png',16,16); //empty, lampara, boomerang, bomba
@@ -45,7 +46,7 @@ zelda.level1 = {
         
         //Bg
         bg = zelda.game.add.sprite(0,0,'bg');
-        bg.scale.setTo(2);
+        //bg.scale.setTo(2);
         
         //house level
         //s = silla, m = mesa pequeña, M = mesa grande, c = cofre, g=gerro, X = muro, L i R = muro puerta, e = exit
@@ -70,7 +71,7 @@ zelda.level1 = {
                 switch(this.level[i][j]){
                     case 'X':
                         wall = this.game.add.sprite(32*j+16, 32*i+16, 'wall');
-                        wall.scale.setTo(2);
+                        //wall.scale.setTo(2);
                         this.game.physics.arcade.enable(wall);
                         wall.body.immovable = true;
                         this.walls.add(wall);
@@ -141,26 +142,26 @@ zelda.level1 = {
         
         //HUD
         this.HUD = this.game.add.sprite(0,0,'HUD',0);
-        this.HUD.scale.setTo(2);
+        //this.HUD.scale.setTo(2);
         this.HUD.fixedToCamera = true;
         this.HUD.isInDungeon = false;
-        this.HUD.item = this.game.add.sprite(40*2,23*2,'items',0);
+        this.HUD.item = this.game.add.sprite(40,23,'items',0);
         this.HUD.item.fixedToCamera = true;
-        this.HUD.item.scale.setTo(2);
+        //this.HUD.item.scale.setTo(2);
         this.HUD.health = this.game.add.group();
         this.HUD.health.fixedToCamera = true;
         //Here we'll create 10 of them evenly spaced apart
         for (var i = 0; i < 10; i++){
             //  Create a heart inside of the 'health' group
-            var heart = this.HUD.health.create(i*16+161*2, 24*2, 'health',0);
-            heart.scale.setTo(2);
+            var heart = this.HUD.health.create(i*8+161, 24, 'health',0);
+            //heart.scale.setTo(2);
         }
         this.HUD.magicBar = this.game.add.group();
         this.HUD.magicBar.fixedToCamera = true;
         for (var i = 0; i < 16; i++){
             //  Create a piece of magic inside of the 'magicBar' group
-            var magicPortion = this.HUD.magicBar.create(24*2, 53*2-i*4, 'magicBar',0);
-            magicPortion.scale.setTo(2);
+            var magicPortion = this.HUD.magicBar.create(24, 53-i*2, 'magicBar',0);
+            //magicPortion.scale.setTo(2);
         }
         this.HUD.font = this.game.add.retroFont('hudNumbersFont',7,7,'0123456789',5,1,1);
         
@@ -225,8 +226,8 @@ zelda.level1 = {
             this.HUD.font.text += (' ' +auxString);
         }
         this.HUD.font.customSpacingX = 1;
-        var i = this.game.add.image(65*2, 24*2, this.HUD.font);
-        i.scale.setTo(2);
+        var i = this.game.add.image(65, 24, this.HUD.font);
+        //i.scale.setTo(2);
         i.fixedToCamera = true;
         
     }

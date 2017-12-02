@@ -4,7 +4,7 @@ zelda.link_prefab = function(game, x, y, level){
     
     Phaser.Sprite.call(this, game, x, y, 'linkWalk_noShield');
     this.anchor.setTo(.5);
-    this.scale.setTo(2);
+    //this.scale.setTo(2);
     
     game.physics.arcade.enable(this);
     //this.body.collideWorldBounds = true;
@@ -162,7 +162,7 @@ zelda.link_prefab.prototype.attack = function(){
     }
     
     var animAttack = this.direction == 10 ? sprAttack.animations.add('shortAttack',[0,1,2,3,4,5,6,7,8]) : sprAttack.animations.add('shortAttack',[0,1,2,3,4,5]);
-    sprAttack.scale.setTo(2);
+    //sprAttack.scale.setTo(2);
     if(this.direction == 24) sprAttack.scale.x *= -1;
     sprAttack.anchor.setTo(.5);
     sprAttack.animations.play('shortAttack',50,false, true);
