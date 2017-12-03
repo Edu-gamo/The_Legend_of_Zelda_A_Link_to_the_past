@@ -70,64 +70,71 @@ zelda.level1 = {
             for(var j = 0; j < this.level[i].length; j++){
                 switch(this.level[i][j]){
                     case 'X':
-                        wall = this.game.add.sprite(32*j+16, 32*i+16, 'wall');
+                        wall = this.game.add.sprite(16*j+8, 16*i+8, 'wall');
                         //wall.scale.setTo(2);
                         this.game.physics.arcade.enable(wall);
                         wall.body.immovable = true;
                         this.walls.add(wall);
                         break;
                     case 'L':
-                        wall = this.game.add.sprite(32*j+16, 32*i+16, 'wall');
-                        wall.scale.y = 2
+                        wall = this.game.add.sprite(16*j+8, 16*i+8, 'wall');
+                        wall.scale.x = 0.5
                         this.game.physics.arcade.enable(wall);
                         wall.body.immovable = true;
                         this.walls.add(wall);
                         break;
                     case 'R':
-                        wall = this.game.add.sprite(32*j+32, 32*i+16, 'wall');
-                        wall.scale.y = 2
+                        wall = this.game.add.sprite(16*j+16, 16*i+8, 'wall');
+                        wall.scale.x = 0.5
                         this.game.physics.arcade.enable(wall);
                         wall.body.immovable = true;
                         this.walls.add(wall);
                         break;
                     case 's':
-                        silla = this.game.add.sprite(32*j+16, 32*i+16, 'silla');
-                        silla.scale.setTo(1.75);
+                        silla = this.game.add.sprite(16*j+8, 16*i+8, 'silla');
+                        //silla.scale.setTo(1.75);
                         this.game.physics.arcade.enable(silla);
                         silla.body.immovable = true;
                         this.walls.add(silla);
                         break;
                     case 'M':
-                        mesa = this.game.add.sprite(32*j+16, 32*i+16, 'mesa');
-                        mesa.scale.setTo(1.75);
+                        mesa = this.game.add.sprite(16*j+8, 16*i+8, 'mesa');
+                        //mesa.scale.setTo(1.75);
                         this.game.physics.arcade.enable(mesa);
                         mesa.body.immovable = true;
                         this.walls.add(mesa);
                         break;
                     case 'm':
-                        mesa = this.game.add.sprite(32*j+16, 32*i+16, 'mesa');
+                        mesa = this.game.add.sprite(16*j+8, 16*i+8, 'mesa');
+                        mesa.scale.setTo(0.75);
                         this.game.physics.arcade.enable(mesa);
                         mesa.body.immovable = true;
                         this.walls.add(mesa);
                         break;
                     case 'c':
-                        cofre = this.game.add.sprite(32*j+16, 32*i+16, 'cofre');
-                        cofre.scale.setTo(1.75);
+                        cofre = this.game.add.sprite(16*j+8, 16*i+8, 'cofre');
+                        //cofre.scale.setTo(1.75);
                         this.game.physics.arcade.enable(cofre);
                         cofre.body.immovable = true;
                         this.walls.add(cofre);
                         break;
                     case 'g':
-                        gerro = this.game.add.sprite(32*j+16, 32*i+16, 'gerro');
-                        gerro.scale.setTo(2);
+                        gerro = this.game.add.sprite(16*j+8, 16*i+8, 'gerro');
+                        //gerro.scale.setTo(2);
                         this.game.physics.arcade.enable(gerro);
                         gerro.body.immovable = true;
                         gerro.state = 0; //0 = en suelo, 1 = recogido, 2 = lanzado
+                        ////////////////////////////////////////////////////
+                        gerro.collider = this.game.add.sprite(0, 0, null);
+                        this.game.physics.arcade.enable(gerro.collider);
+                        gerro.collider.body.setSize(gerro.width*0.75, gerro.height*0.75, gerro.x+gerro.width*0.125, gerro.y+gerro.height*0.125);
+                        gerro.collider.body.immovable = true;
+                        ////////////////////////////////////////////////////
                         this.objects.add(gerro);
                         break;
                     case 'e':
-                        out = this.game.add.sprite(32*j+16, 32*i+32, 'wall');
-                        out.scale.setTo(2);
+                        out = this.game.add.sprite(16*j+8, 16*i+16, 'wall');
+                        //out.scale.setTo(2);
                         this.game.physics.arcade.enable(out);
                         out.body.immovable = true;
                         this.exit.add(out);
@@ -137,7 +144,7 @@ zelda.level1 = {
         }
         
         //Link prefab
-        this.link = new zelda.link_prefab(this.game, 100, 100, this);
+        this.link = new zelda.link_prefab(this.game, 100, 50, this);
         this.game.add.existing(this.link);
         
         //HUD

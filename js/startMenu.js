@@ -4,7 +4,8 @@ zelda.menu = {
     
     init:function(){
         
-        
+        this.scale.setUserScale(2,2);
+        this.scale.scaleMode = Phaser.ScaleManager.USER_SCALE; //or SHOW_ALL
         
     },
     
@@ -33,7 +34,8 @@ zelda.menu = {
         
         //main screen and intro
         this.intro = this.game.add.video('introScreen');
-        var introSprite = this.intro.addToWorld(this.game.width/2, this.game.height/2,0.5,0.5,0.5,0.5);
+        //var introSprite = this.intro.addToWorld(this.game.width/2, this.game.height/2,0.5,0.5,0.5,0.5);
+        var introSprite = this.intro.addToWorld(this.game.width/2, this.game.height/2,0.5,0.5,0.35,0.35);
         this.intro.play(true);
     },
     
@@ -45,11 +47,11 @@ zelda.menu = {
             case 'select':
                 this.intro.stop();
                 bg_img = zelda.game.add.image(0,0,'playerSelection');
-                bg_img.scale.setTo(2);
+                //bg_img.scale.setTo(2);
                 break;
             case 'register':
                 bg_img = zelda.game.add.image(0,0,'playerRegister');
-                bg_img.scale.setTo(2);
+                //bg_img.scale.setTo(2);
                 break;
             case 'game':
                 zelda.game.state.start('level1');

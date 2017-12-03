@@ -8,6 +8,7 @@ zelda.link_prefab = function(game, x, y, level){
     
     game.physics.arcade.enable(this);
     //this.body.collideWorldBounds = true;
+    this.body.setSize(this.width, this.height/2, 0, this.height/2);
     
     this.direction = 3; //front=3,back=10,right=17,left=24;
     this.hasWeapon = false;
@@ -21,7 +22,7 @@ zelda.link_prefab = function(game, x, y, level){
     this.arrows = 0;
     this.keys = 0;
     this.object = null; //objeto recogido del entorno
-    this.throwForce = 100; //velocidad con la que lanza el objeto
+    this.throwForce = 150; //velocidad con la que lanza el objeto
     
     //game.load.spritesheet('linkWalk_Shield','img/link_shield_walk_spritesheet.png',23.28,29);
     if(this.hasWeapon) this.loadTexture('linkWalk_Shield'); //canviarho a un overlap amb les armes
@@ -54,7 +55,15 @@ zelda.link_prefab.prototype.update = function(){
     
     if(this.zKey.isUp) this.canGetObject = true;
     
-    if(this.object != null) this.object.position.setTo(this.position.x-this.object.width/2, this.position.y-this.height);
+    if(this.object != null){
+        if(this.object.state == 1){
+            this.object.position.setTo(this.position.x-this.object.width/2, this.position.y-this.height);
+        }else if(Math.abs(this.object.x - this.x)+Math.abs(this.object.y - this.y) > this.width*4){
+            //Pintar efecto de destruccion
+            this.object.kill();
+            this.object = null;
+        }
+    }
     
     if(!this.attacking){
         this.movement();
@@ -76,9 +85,10 @@ zelda.link_prefab.prototype.update = function(){
             if(link.zKey.isDown && link.zKey.downDuration(1) && link.object == null && link.canGetObject){
                 link.object = object;
                 object.state = 1;
-            }else{
+            }/*else{
                 zelda.game.physics.arcade.collide(link, object);
-            }
+            }*/
+            zelda.game.physics.arcade.collide(link, object.collider);
         }
     });
     
@@ -192,6 +202,6 @@ zelda.link_prefab.prototype.throwObject = function(){
             break;
     }
     
-    this.object = null;
+    //this.object = null;
     
 }
