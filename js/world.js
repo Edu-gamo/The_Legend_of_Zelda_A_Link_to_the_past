@@ -4,9 +4,9 @@ zelda.world = {
     
     init:function(){
         
-        zelda.game.world.setBounds(512*2,1024*2,512*2,512*2);
-        //this.scale.setUserScale(2,2);
-        //this.scale.scaleMode = Phaser.ScaleManager.USER_SCALE; //or SHOW_ALL
+        zelda.game.world.setBounds(512,1024,512,512);
+        this.scale.setUserScale(2,2);
+        this.scale.scaleMode = Phaser.ScaleManager.USER_SCALE; //or SHOW_ALL
         
         
         
@@ -34,33 +34,28 @@ zelda.world = {
     
     create:function(){
         this._bg = zelda.game.add.sprite(0,0,'bg');//----------------------------------------
-        this._bg.scale.setTo(2);
         //Link
-        this.link = new zelda.link_prefab(this.game, (256+512-64)*2,(256+1024+16)*2, this);
+        this.link = new zelda.link_prefab(this.game, (256+512-64),(256+1024+16), this);
         this.game.add.existing(this.link);
         
         //HUD
         this.HUD = this.game.add.sprite(0,0,'HUD',0);
-        this.HUD.scale.setTo(2);
         this.HUD.fixedToCamera = true;
         this.HUD.isInDungeon = false;
-        this.HUD.item = this.game.add.sprite(40*2,23*2,'items',0);
+        this.HUD.item = this.game.add.sprite(40,23,'items',0);
         this.HUD.item.fixedToCamera = true;
-        this.HUD.item.scale.setTo(2);
         this.HUD.health = this.game.add.group();
         this.HUD.health.fixedToCamera = true;
         //Here we'll create 10 of them evenly spaced apart
         for (var i = 0; i < 10; i++){
             //  Create a heart inside of the 'health' group
-            var heart = this.HUD.health.create(i*16+161*2, 24*2, 'health',0);
-            heart.scale.setTo(2);
+            var heart = this.HUD.health.create(i*8+161, 24, 'health',0);
         }
         this.HUD.magicBar = this.game.add.group();
         this.HUD.magicBar.fixedToCamera = true;
         for (var i = 0; i < 16; i++){
             //  Create a piece of magic inside of the 'magicBar' group
-            var magicPortion = this.HUD.magicBar.create(24*2, 53*2-i*4, 'magicBar',0);
-            magicPortion.scale.setTo(2);
+            var magicPortion = this.HUD.magicBar.create(24, 53-i*2, 'magicBar',0);
         }
         this.HUD.font = this.game.add.retroFont('hudNumbersFont',7,7,'0123456789',5,1,1);
         
@@ -84,7 +79,7 @@ zelda.world = {
         }
     },
     
-    xKeyPressed:function(){
+    /*xKeyPressed:function(){
         if(!link.attacking){
         link.attacking = true;
         
@@ -125,7 +120,7 @@ zelda.world = {
     endAttack:function(){
         link.attacking = false;
         link.visible = true;
-    },
+    },*/
     
     setHudValues:function(){ //set magic bar, item Selected, number of rupies etc, hp...
         //item
@@ -181,8 +176,7 @@ zelda.world = {
             this.HUD.font.text += (' ' +auxString);
         }
         this.HUD.font.customSpacingX = 1;
-        var i = this.game.add.image(65*2, 24*2, this.HUD.font);
-        i.scale.setTo(2);
+        var i = this.game.add.image(65, 24, this.HUD.font);
         i.fixedToCamera = true;
         
     },
@@ -193,12 +187,12 @@ zelda.world = {
         this.link.body.velocity.set(0);
         //this.camera.unfollow();
         
-        if(this.link.position.y < 1024*2) {
+        if(this.link.position.y < 1024) {
             this.link.zone = 2;
             //moure la camara
             //for(var i = 0; i < 300; ++i) this.camera.y -= 1;
         }
-        else if(this.link.position.x < 512*2){
+        else if(this.link.position.x < 512){
             this.link.zone = 1;
             //moure la camara
         }
@@ -212,13 +206,13 @@ zelda.world = {
         
         //aixo fora
         if(this.link.zone == 0){
-            zelda.game.world.setBounds(512*2,1024*2,512*2,512*2);
+            zelda.game.world.setBounds(512,1024,512,512);
         }
         if(this.link.zone == 1){
-            zelda.game.world.setBounds(0,1024*2,512*2,512*2);
+            zelda.game.world.setBounds(0,1024,512,512);
         }
         if(this.link.zone == 2){
-            zelda.game.world.setBounds(0,0,1024*2,1024*2);
+            zelda.game.world.setBounds(0,0,1024,1024);
         }
     }
     

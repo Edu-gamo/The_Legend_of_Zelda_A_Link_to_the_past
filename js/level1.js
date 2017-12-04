@@ -149,7 +149,6 @@ zelda.level1 = {
         
         //HUD
         this.HUD = this.game.add.sprite(0,0,'HUD',0);
-        //this.HUD.scale.setTo(2);
         this.HUD.fixedToCamera = true;
         this.HUD.isInDungeon = false;
         this.HUD.item = this.game.add.sprite(40,23,'items',0);
@@ -168,7 +167,6 @@ zelda.level1 = {
         for (var i = 0; i < 16; i++){
             //  Create a piece of magic inside of the 'magicBar' group
             var magicPortion = this.HUD.magicBar.create(24, 53-i*2, 'magicBar',0);
-            //magicPortion.scale.setTo(2);
         }
         this.HUD.font = this.game.add.retroFont('hudNumbersFont',7,7,'0123456789',5,1,1);
         

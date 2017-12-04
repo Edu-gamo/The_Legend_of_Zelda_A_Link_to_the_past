@@ -3,7 +3,7 @@ var zelda = zelda || {};
 var gameOptions = {
     gameWidth:256,
     gameHeight:224,
-    linkSpeed:200
+    linkSpeed:100
 };
 
 zelda.game = new Phaser.Game(gameOptions.gameWidth, gameOptions.gameHeight, Phaser.AUTO, null, this, false, false);

@@ -4,7 +4,6 @@ zelda.link_prefab = function(game, x, y, level){
     
     Phaser.Sprite.call(this, game, x, y, 'linkWalk_noShield');
     this.anchor.setTo(.5);
-    //this.scale.setTo(2);
     
     game.physics.arcade.enable(this);
     //this.body.collideWorldBounds = true;
@@ -157,24 +156,24 @@ zelda.link_prefab.prototype.attack = function(){
     
     switch(this.direction){
         case 3:
-            sprAttack = this.game.add.sprite(this.body.center.x,this.body.center.y,'attack_front');
+            sprAttack = this.game.add.sprite(this.centerX,this.centerY,'attack_front');
             break;
         
         case 10:
-            sprAttack = this.game.add.sprite(this.body.center.x,this.body.center.y,'attack_back');
+            sprAttack = this.game.add.sprite(this.centerX,this.centerY,'attack_back');
             break;
         
         case 17:
         case 24:
-            sprAttack = this.game.add.sprite(this.body.center.x,this.body.center.y,'attack_right');
+            sprAttack = this.game.add.sprite(this.centerX,this.centerY,'attack_right');
             break;
             
     }
-    
-    var animAttack = this.direction == 10 ? sprAttack.animations.add('shortAttack',[0,1,2,3,4,5,6,7,8]) : sprAttack.animations.add('shortAttack',[0,1,2,3,4,5]);
-    //sprAttack.scale.setTo(2);
-    if(this.direction == 24) sprAttack.scale.x *= -1;
     sprAttack.anchor.setTo(.5);
+    var animAttack = this.direction == 3 ? sprAttack.animations.add('shortAttack',[0,1,2,3,4,5]) : sprAttack.animations.add('shortAttack',[0,1,2,3,4,5,6,7,8]);
+
+    if(this.direction == 24) sprAttack.scale.x *= -1;
+    //sprAttack.anchor.setTo(.5);
     sprAttack.animations.play('shortAttack',50,false, true);
     animAttack.onComplete.add(function(){
         this.attacking = false;
