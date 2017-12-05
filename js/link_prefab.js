@@ -84,11 +84,21 @@ zelda.link_prefab.prototype.update = function(){
             if(link.zKey.isDown && link.zKey.downDuration(1) && link.object == null && link.canGetObject){
                 link.object = object;
                 object.state = 1;
+                object.bringToTop();
+                object.frame = 2;
             }/*else{
                 zelda.game.physics.arcade.collide(link, object);
             }*/
             zelda.game.physics.arcade.collide(link, object.collider);
         }
+    });
+    
+    //Collide with cofres
+    this.game.physics.arcade.overlap(this, this.level.cofres, function(link, cofre){
+        if(link.zKey.isDown && link.zKey.downDuration(1) && link.canGetObject){
+            cofre.frame = 1;
+        }
+        zelda.game.physics.arcade.collide(link, cofre.collider);
     });
     
     //Overlap with exit

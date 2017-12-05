@@ -28,8 +28,12 @@ zelda.level1 = {
         //house objects
         this.load.image('mesa','img/mesa.png');
         this.load.image('silla','img/silla.png');
-        this.load.image('gerro','img/gerro.png');
-        this.load.image('cofre','img/cofre.png');
+        /*this.load.image('gerro','img/gerro.png');
+        this.load.image('cofre','img/cofre.png');*/
+        this.load.image('cama','img/cama.png');
+        
+        zelda.game.load.spritesheet('gerro','img/spr_gerro.png',16,16);
+        zelda.game.load.spritesheet('cofre','img/spr_cofre.png',16,16);
         
         this.load.image('wall','img/invisible_wall.png');
         
@@ -52,20 +56,21 @@ zelda.level1 = {
         //s = silla, m = mesa pequeña, M = mesa grande, c = cofre, g=gerro, X = muro, L i R = muro puerta, e = exit
         this.level = [
             'XXXXXXXXXXXXX',
-            'Xg          X',
+            'Xgc         X',
             'Xg       s  X',
             'Xg      M   X',
             'X           X',
-            'X        s cX',
+            'X        s CX',
             'X m         X',
             'X           X',
             'XXXXXL RXXXXX',
             '     eee     '
         ];
         
-        this.objects = this.game.add.group();
-        this.walls = this.game.add.group();
         this.exit = this.game.add.group();
+        this.walls = this.game.add.group();
+        this.objects = this.game.add.group();
+        this.cofres = this.game.add.group();
         for(var i = 0; i < this.level.length; i++){
             for(var j = 0; j < this.level[i].length; j++){
                 switch(this.level[i][j]){
@@ -112,11 +117,24 @@ zelda.level1 = {
                         this.walls.add(mesa);
                         break;
                     case 'c':
+                        cama = this.game.add.sprite(16*j+12, 16*i+8, 'cama');
+                        this.game.physics.arcade.enable(cama);
+                        cama.body.setSize(cama.width*0.75, cama.height, 0+cama.width*0.125, 0);
+                        cama.body.immovable = true;
+                        this.walls.add(cama);
+                        break;
+                    case 'C':
                         cofre = this.game.add.sprite(16*j+8, 16*i+8, 'cofre');
                         //cofre.scale.setTo(1.75);
                         this.game.physics.arcade.enable(cofre);
                         cofre.body.immovable = true;
-                        this.walls.add(cofre);
+                        ////////////////////////////////////////////////////
+                        cofre.collider = this.game.add.sprite(0, 0, null);
+                        this.game.physics.arcade.enable(cofre.collider);
+                        cofre.collider.body.setSize(cofre.width*0.75, cofre.height*0.75, cofre.x+cofre.width*0.125, cofre.y+cofre.height*0.125);
+                        cofre.collider.body.immovable = true;
+                        ////////////////////////////////////////////////////
+                        this.cofres.add(cofre);
                         break;
                     case 'g':
                         gerro = this.game.add.sprite(16*j+8, 16*i+8, 'gerro');
