@@ -33,6 +33,7 @@ zelda.world = {
         //inventari
         this.load.image('inventari','img/inventari.png');
         this.load.spritesheet('itemName','img/objecteSeleccionat_inventari.png',80,48); //lamp, bomb, boomerang, empty
+        this.load.spritesheet('greenCircle_inv','img/cercleVerd.png',32,32);
         
         
                
@@ -72,8 +73,7 @@ zelda.world = {
         //------------------------------TESTING---------------------------------
         this.link.checkWorldBounds=true;
         //this.link.events.onEnterBounds.add(this.changeZone,this);
-        this.link.zone = 0; //0 = house, 1 = left, 2 = castle
-        this.changingZone = false;
+        
         this.space = zelda.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         //--------------------------------
         //inventari
@@ -81,10 +81,17 @@ zelda.world = {
         this.showInventari = false;
         this.INVENTORY = this.game.add.group();
         this.inventory_bg = this.INVENTORY.create(0,-224,'inventari');
-        //this.bombInventory = this.INVENTORY.create(0,0,'items',3); //s'ha de crear i afegir a INVENTORY quan té una bomba
-        //this.lampInventory = this.INVENTORY.create(0,0,'items',1);
-        //this.boomerangInventory = this.INVENTORY.create(0,0,'items',2);
         this.INVENTORY.fixedToCamera = true;
+        this.greenCircle = this.INVENTORY.create(32-8,79-224-8,'greenCircle_inv');
+//        this.greenCircle.anchor.setTo(0.5);
+        this.greenCircle.animations.add('intermitent',[0,1],2,true);
+        this.greenCircle.animations.play('intermitent');
+        this.circleIndex = 0;
+        this.lampInv = this.INVENTORY.create(32,79-224,'items',1);
+        this.boomerangInv = this.INVENTORY.create(56,31-224,'items',3);
+        this.bombInv = this.INVENTORY.create(104,31-224,'items',2);     
+        this.cursors = this.game.input.keyboard.createCursorKeys();
+        
         
     },
     
@@ -106,7 +113,7 @@ zelda.world = {
     
     setHudValues:function(){ //set magic bar, item Selected, number of rupies etc, hp...
         //item
-        this.item.frame = 1//;this.link.itemSelected;
+//        this.item.frame = 0;//this.link.itemSelected;
         
         //health
         for(var i = 0; i < this.healthDisplay.children.length; ++i){
@@ -231,6 +238,9 @@ zelda.world = {
     },
     
     inventoryManager:function(){
+//        if(this.link.itemSelected == null) this.greenCircle.visible=false;
+//        else this.greenCircle.visible = true;
+        
         if(this.enter.isDown && this.enter.downDuration(1) && !this.game.tweens.isTweening(this.HUD)){
                 
                 if(!this.showInventari){
@@ -265,6 +275,52 @@ zelda.world = {
 
                 }
             }
+        
+        //events de teclat
+        if(this.showInventari){
+            if(this.link.itemsAvailable.length >0){
+                if(this.cursors.right.isDown && this.cursors.right.downDuration(1)){
+                    this.circleIndex ++;
+                    if(this.circleIndex == 3) this.circleIndex = 0;
+                    this.greenCircle.animations.stop();
+                    this.greenCircle.animations.play('intermitent');
+                }
+                if(this.cursors.left.isDown && this.cursors.left.downDuration(1)){
+                    this.circleIndex --;
+                    if(this.circleIndex == -1) this.circleIndex = 2;
+                    this.greenCircle.animations.stop();
+                    this.greenCircle.animations.play('intermitent');
+                }
+                
+                switch(this.circleIndex){
+                    case 0:
+                        this.greenCircle.x = this.lampInv.x-8;
+                        this.greenCircle.y = this.lampInv.y-8;
+                        if(this.enter.isDown && this.enter.downDuration(1)){
+                            this.link.itemSelected = "lamp";
+                            this.item.frame = 1;
+                        }
+                        
+                        break;
+                    case 1:
+                        this.greenCircle.x = (this.boomerangInv.x-8);
+                        this.greenCircle.y = (this.boomerangInv.y-8);
+                        if(this.enter.isDown && this.enter.downDuration(1)) {
+                            this.link.itemSelected = "boomerang";
+                            this.item.frame = 3;
+                        }
+                        break;
+                    case 2:
+                        this.greenCircle.x = (this.bombInv.x-8);
+                        this.greenCircle.y = (this.bombInv.y-8);
+                        if(this.enter.isDown && this.enter.downDuration(1)) {
+                            this.link.itemSelected = "bomb";
+                            this.item.frame = 2;
+                        }
+                        break;
+                }
+            }
+        }
     }
     
 };

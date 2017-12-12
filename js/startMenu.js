@@ -187,15 +187,17 @@ zelda.menu = {
                             }else if(keyboardI == 6 || keyboardI==18 || keyboardI==25){
                                 wordIndex++;
                             }else if(keyboardI==8 || keyboardI==9 || keyboardI==20 || keyboardI==21 || keyboardI==27 || keyboardI==28){
-                                console.log('return to playerSelect with name: ' + font.text); 
-                                this.nomPartides[this.registerOption] = font.text; //toString?
-                                menuState = 'select';
-                                this.onCreate = true;
-                                
-                                bg_img.destroy();
-                                lh.visible = false; lv.visible = false;
-                                virtualKeyboard.visible = false;
-                                corIndex.visible = false;
+                                if(font.text != '      '){
+                                    console.log('return to playerSelect with name: ' + font.text); 
+                                    this.nomPartides[this.registerOption] = font.text; //toString?
+                                    menuState = 'select';
+                                    this.onCreate = true;
+
+                                    bg_img.destroy();
+                                    lh.visible = false; lv.visible = false;
+                                    virtualKeyboard.visible = false;
+                                    corIndex.visible = false;
+                                }
                                 
                                 
                                 

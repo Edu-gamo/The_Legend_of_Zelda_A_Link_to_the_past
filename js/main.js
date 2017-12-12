@@ -21,4 +21,4 @@ WebFontConfig = {
 zelda.game.state.add('main', zelda.menu);
 zelda.game.state.add('level1', zelda.level1);
 zelda.game.state.add('world', zelda.world);
-zelda.game.state.start('world');
+zelda.game.state.start('main');

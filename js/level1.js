@@ -44,6 +44,10 @@ zelda.level1 = {
         this.load.spritesheet('magicBar','img/magicMeter.png',8,2);
         this.load.image('hudNumbersFont','img/HUDnumbers.png');
         
+        //inventari
+        this.load.image('inventari','img/inventari.png');
+        this.load.spritesheet('itemName','img/objecteSeleccionat_inventari.png',80,48); //lamp, bomb, boomerang, empty
+        this.load.spritesheet('greenCircle_inv','img/cercleVerd.png',32,32);
     },
     
     create:function(){
@@ -166,27 +170,48 @@ zelda.level1 = {
         this.game.add.existing(this.link);
         
         //HUD
-        this.HUD = this.game.add.sprite(0,0,'HUD',0);
-        this.HUD.fixedToCamera = true;
-        this.HUD.isInDungeon = false;
-        this.HUD.item = this.game.add.sprite(40,23,'items',0);
-        this.HUD.item.fixedToCamera = true;
-        //this.HUD.item.scale.setTo(2);
-        this.HUD.health = this.game.add.group();
-        this.HUD.health.fixedToCamera = true;
+        this.HUD = this.game.add.group();
+        this.hud_bg = this.HUD.create(0,0,'HUD',0);
+        this.hud_bg.isInDungeon = false;
+        this.item = this.HUD.create(40,23,'items',0);
+        this.healthDisplay = this.game.add.group();
         //Here we'll create 10 of them evenly spaced apart
         for (var i = 0; i < 10; i++){
             //  Create a heart inside of the 'health' group
-            var heart = this.HUD.health.create(i*8+161, 24, 'health',0);
-            //heart.scale.setTo(2);
+            //var heart = 
+            this.healthDisplay.create(i*8+161, 24, 'health',0);
         }
-        this.HUD.magicBar = this.game.add.group();
-        this.HUD.magicBar.fixedToCamera = true;
+        this.HUD.add(this.healthDisplay);
+        this.magicBar = this.game.add.group();
         for (var i = 0; i < 16; i++){
             //  Create a piece of magic inside of the 'magicBar' group
-            var magicPortion = this.HUD.magicBar.create(24, 53-i*2, 'magicBar',0);
+            //var magicPortion = 
+            this.magicBar.create(24, 53-i*2, 'magicBar',0);
         }
-        this.HUD.font = this.game.add.retroFont('hudNumbersFont',7,7,'0123456789',5,1,1);
+        this.HUD.add(this.magicBar);
+        this.fontItemsDisplay = this.game.add.retroFont('hudNumbersFont',7,7,'0123456789',5,1,1);
+        this.imageFromFont = this.game.add.image(65, 24, this.fontItemsDisplay);
+        this.HUD.add(this.imageFromFont);
+        this.HUD.fixedToCamera = true;
+        
+        //inventari
+        this.enter = zelda.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+        this.showInventari = false;
+        this.INVENTORY = this.game.add.group();
+        this.inventory_bg = this.INVENTORY.create(0,-224,'inventari');
+        //this.bombInventory = this.INVENTORY.create(0,0,'items',3); //s'ha de crear i afegir a INVENTORY quan té una bomba
+        //this.lampInventory = this.INVENTORY.create(0,0,'items',1);
+        //this.boomerangInventory = this.INVENTORY.create(0,0,'items',2);
+        this.INVENTORY.fixedToCamera = true;
+        this.greenCircle = this.INVENTORY.create(32-8,79-224-8,'greenCircle_inv');
+//        this.greenCircle.anchor.setTo(0.5);
+        this.greenCircle.animations.add('intermitent',[0,1],2,true);
+        this.greenCircle.animations.play('intermitent');
+        this.circleIndex = 0;
+        this.lampInv = this.INVENTORY.create(32,79-224,'items',1);
+        this.boomerangInv = this.INVENTORY.create(56,31-224,'items',3);
+        this.bombInv = this.INVENTORY.create(104,31-224,'items',2);     
+        this.cursors = this.game.input.keyboard.createCursorKeys();
         
     },
     
@@ -198,61 +223,61 @@ zelda.level1 = {
     },
     setHudValues:function(){ //set magic bar, item Selected, number of rupies etc, hp...
         //item
-        this.HUD.item.frame = this.link.itemSelected;
+//        this.item.frame = 0;//this.link.itemSelected;
         
         //health
-        for(var i = 0; i < this.HUD.health.children.length; ++i){
+        for(var i = 0; i < this.healthDisplay.children.length; ++i){
             if(i < this.link.hearts){//pinta algun cor
                 if(i < this.link.health/2){
-                    this.HUD.health.children[i].frame = 0;
+                    this.healthDisplay.children[i].frame = 0;
                     if(this.link.health%2 != 0){ //health is odd
                         if(i+1 == (this.link.health+1)/2){
-                            this.HUD.health.children[i].frame = 1;
+                            this.healthDisplay.children[i].frame = 1;
                         }
                     }
                 }else{
-                    this.HUD.health.children[i].frame = 2;
+                    this.healthDisplay.children[i].frame = 2;
                 }
             }else{
-                this.HUD.health.children[i].frame = 3;//no cor
+                this.healthDisplay.children[i].frame = 3;//no cor
             } 
         }
         
         //magic bar
-        for(var i = 0; i < this.HUD.magicBar.children.length; ++i){
+        for(var i = 0; i < this.magicBar.children.length; ++i){
             if(i < this.link.magic){
                 if(i == this.link.magic-1){
-                    this.HUD.magicBar.children[i].frame = 0;
+                    this.magicBar.children[i].frame = 0;
                 }else{
-                    this.HUD.magicBar.children[i].frame = 1;
+                    this.magicBar.children[i].frame = 1;
                 }
             }else{
-                this.HUD.magicBar.children[i].frame = 2;
+                this.magicBar.children[i].frame = 2;
             }
         }
+        
         
         //Number of objects (count)
         //rupees
         var auxString = String(this.link.rupees);
         while(auxString.length < 3) auxString = '0'+auxString;
-        this.HUD.font.text = auxString;
+        this.fontItemsDisplay.text = auxString;
         //bombs
         auxString = String(this.link.bombs);
         while(auxString.length < 2) auxString = '0'+auxString;
-        this.HUD.font.text += (' ' +auxString);
+        this.fontItemsDisplay.text += (' ' +auxString);
         //Arrows
         auxString = String(this.link.arrows);
         while(auxString.length < 2) auxString = '0'+auxString;
-        this.HUD.font.text += (' ' +auxString);
+        this.fontItemsDisplay.text += (' ' +auxString);
         //Keys
-        if(this.HUD.isInDungeon){
+        if(this.hud_bg.isInDungeon){
             auxString = String(this.link.keys);
-            this.HUD.font.text += (' ' +auxString);
+            this.fontItemsDisplay.text += (' ' +auxString);
         }
-        this.HUD.font.customSpacingX = 1;
-        var i = this.game.add.image(65, 24, this.HUD.font);
-        //i.scale.setTo(2);
-        i.fixedToCamera = true;
+        this.fontItemsDisplay.customSpacingX = 1;
+        //this.imageFromFont = this.game.add.image(65, 24, this.fontItemsDisplay);
+        //this.imageFromFont.fixedToCamera = true;
         
     },
     
@@ -291,6 +316,52 @@ zelda.level1 = {
 
                 }
             }
+        
+        //events de teclat
+        if(this.showInventari){
+            if(this.link.itemsAvailable.length >0){
+                if(this.cursors.right.isDown && this.cursors.right.downDuration(1)){
+                    this.circleIndex ++;
+                    if(this.circleIndex == 3) this.circleIndex = 0;
+                    this.greenCircle.animations.stop();
+                    this.greenCircle.animations.play('intermitent');
+                }
+                if(this.cursors.left.isDown && this.cursors.left.downDuration(1)){
+                    this.circleIndex --;
+                    if(this.circleIndex == -1) this.circleIndex = 2;
+                    this.greenCircle.animations.stop();
+                    this.greenCircle.animations.play('intermitent');
+                }
+                
+                switch(this.circleIndex){
+                    case 0:
+                        this.greenCircle.x = this.lampInv.x-8;
+                        this.greenCircle.y = this.lampInv.y-8;
+                        if(this.enter.isDown && this.enter.downDuration(1)){
+                            this.link.itemSelected = "lamp";
+                            this.item.frame = 1;
+                        }
+                        
+                        break;
+                    case 1:
+                        this.greenCircle.x = (this.boomerangInv.x-8);
+                        this.greenCircle.y = (this.boomerangInv.y-8);
+                        if(this.enter.isDown && this.enter.downDuration(1)) {
+                            this.link.itemSelected = "boomerang";
+                            this.item.frame = 3;
+                        }
+                        break;
+                    case 2:
+                        this.greenCircle.x = (this.bombInv.x-8);
+                        this.greenCircle.y = (this.bombInv.y-8);
+                        if(this.enter.isDown && this.enter.downDuration(1)) {
+                            this.link.itemSelected = "bomb";
+                            this.item.frame = 2;
+                        }
+                        break;
+                }
+            }
+        }
     }
     
 };

@@ -12,7 +12,8 @@ zelda.link_prefab = function(game, x, y, level){
     this.direction = 3; //front=3,back=10,right=17,left=24;
     this.hasWeapon = false;
     this.attacking = false;
-    this.itemSelected = 0; //lantern=1, boomerang=2, bomb=3
+    this.itemSelected = null; //lamp=1, boomerang=2, bomb=3
+    this.itemsAvailable = ["lamp","boomerang","bomb"]; //bomb, lamp, boomerang
     this.hearts = 3;
     this.health = 6; //cada enter es mig cor
     this.magic = 16; //de 0 a 16
