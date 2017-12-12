@@ -44,6 +44,7 @@ zelda.link_prefab = function(game, x, y, level){
     this.sKey = game.input.keyboard.addKey(Phaser.Keyboard.S); //inventari
     
     this.canGetObject = true;
+    this.canMove = true; //para forzar que link no se pueda mover (pausa)
     
 };
 
@@ -53,7 +54,7 @@ zelda.link_prefab.prototype = Object.create(Phaser.Sprite.prototype);
 zelda.link_prefab.prototype.update = function(){
     
     if(this.zKey.isUp) this.canGetObject = true;
-    
+
     if(this.object != null){
         if(this.object.state == 1){
             this.object.position.setTo(this.position.x-this.object.width/2, this.position.y-this.height);
@@ -63,7 +64,7 @@ zelda.link_prefab.prototype.update = function(){
             this.object = null;
         }
     }
-    
+
     if(!this.attacking){
         this.movement();
         if(((this.zKey.isDown && this.zKey.downDuration(1)) || (this.xKey.isDown && this.xKey.downDuration(1))) && this.object != null){
@@ -73,10 +74,10 @@ zelda.link_prefab.prototype.update = function(){
             this.attack();
         }
     }
-    
+
     //Collide with walls
     this.game.physics.arcade.collide(this, this.level.walls);
-    
+
     //Collide with objects
     //this.game.physics.arcade.collide(this, this.level.objects);
     this.game.physics.arcade.overlap(this, this.level.objects, function(link, object){
@@ -92,7 +93,7 @@ zelda.link_prefab.prototype.update = function(){
             zelda.game.physics.arcade.collide(link, object.collider);
         }
     });
-    
+
     //Collide with cofres
     this.game.physics.arcade.overlap(this, this.level.cofres, function(link, cofre){
         if(link.zKey.isDown && link.zKey.downDuration(1) && link.canGetObject){
@@ -100,117 +101,123 @@ zelda.link_prefab.prototype.update = function(){
         }
         zelda.game.physics.arcade.collide(link, cofre.collider);
     });
-    
+
     //Overlap with exit
     this.game.physics.arcade.overlap(this, this.level.exit, function(){
         zelda.game.state.start('world');
     });
+        
 }
 
 zelda.link_prefab.prototype.movement = function(){
-    
-    //Vertical Axis Movement
-    if(this.cursors.down.isDown){
-        this.body.velocity.y = gameOptions.linkSpeed;
-        if(this.body.velocity.x == 0 || this.direction == 10) this.direction = 3;
-    } else if(this.cursors.up.isDown){
-        this.body.velocity.y = -gameOptions.linkSpeed;
-        if(this.body.velocity.x == 0 || this.direction == 3) this.direction = 10;
-    }else{
-        this.body.velocity.y = 0;
-    }
-    
-    //Horizontal Axis Movement
-    if(this.cursors.right.isDown){
-        this.body.velocity.x = gameOptions.linkSpeed;
-        if(this.body.velocity.y == 0 || this.direction == 24) this.direction = 17;
-    }else if(this.cursors.left.isDown){
-        this.body.velocity.x = -gameOptions.linkSpeed;
-        if(this.body.velocity.y == 0 || this.direction == 17) this.direction = 24;
-    }else{
-        this.body.velocity.x = 0;
-    }
-    
-    //No movement
-    if(this.body.velocity.x == 0 && this.body.velocity.y == 0){
-        this.frame = this.direction;
-    }else{
-        //Play animations
-        switch(this.direction){
-            case 3:
-                this.animations.play('linkWalk_front');
-                break;
-            case 10:
-                this.animations.play('linkWalk_back');
-                break;
-            case 17:
-                this.animations.play('linkWalk_right');
-                break;
-            case 24:
-                this.animations.play('linkWalk_left');
-                break;
+    if(this.canMove){
+        
+        //Vertical Axis Movement
+        if(this.cursors.down.isDown){
+            this.body.velocity.y = gameOptions.linkSpeed;
+            if(this.body.velocity.x == 0 || this.direction == 10) this.direction = 3;
+        } else if(this.cursors.up.isDown){
+            this.body.velocity.y = -gameOptions.linkSpeed;
+            if(this.body.velocity.x == 0 || this.direction == 3) this.direction = 10;
+        }else{
+            this.body.velocity.y = 0;
         }
-    }
 
+        //Horizontal Axis Movement
+        if(this.cursors.right.isDown){
+            this.body.velocity.x = gameOptions.linkSpeed;
+            if(this.body.velocity.y == 0 || this.direction == 24) this.direction = 17;
+        }else if(this.cursors.left.isDown){
+            this.body.velocity.x = -gameOptions.linkSpeed;
+            if(this.body.velocity.y == 0 || this.direction == 17) this.direction = 24;
+        }else{
+            this.body.velocity.x = 0;
+        }
     
+
+        //No movement
+        if(this.body.velocity.x == 0 && this.body.velocity.y == 0){
+            this.frame = this.direction;
+        }else{
+            //Play animations
+            switch(this.direction){
+                case 3:
+                    this.animations.play('linkWalk_front');
+                    break;
+                case 10:
+                    this.animations.play('linkWalk_back');
+                    break;
+                case 17:
+                    this.animations.play('linkWalk_right');
+                    break;
+                case 24:
+                    this.animations.play('linkWalk_left');
+                    break;
+            }
+        }
+
+    }else{//canMove =false
+        this.body.velocity.set(0);
+        this.frame = this.direction;
+    }
 }
 
 zelda.link_prefab.prototype.attack = function(){
-    
-    this.attacking = true;
-    this.body.velocity.setTo(0, 0);
-    this.animations.stop(true);
-    this.visible = false;
-    
-    var sprAttack;
-    
-    switch(this.direction){
-        case 3:
-            sprAttack = this.game.add.sprite(this.centerX,this.centerY,'attack_front');
-            break;
-        
-        case 10:
-            sprAttack = this.game.add.sprite(this.centerX,this.centerY,'attack_back');
-            break;
-        
-        case 17:
-        case 24:
-            sprAttack = this.game.add.sprite(this.centerX,this.centerY,'attack_right');
-            break;
-            
-    }
-    sprAttack.anchor.setTo(.5);
-    var animAttack = this.direction == 3 ? sprAttack.animations.add('shortAttack',[0,1,2,3,4,5]) : sprAttack.animations.add('shortAttack',[0,1,2,3,4,5,6,7,8]);
+    if(this.canMove){
+        this.attacking = true;
+        this.body.velocity.setTo(0, 0);
+        this.animations.stop(true);
+        this.visible = false;
 
-    if(this.direction == 24) sprAttack.scale.x *= -1;
-    //sprAttack.anchor.setTo(.5);
-    sprAttack.animations.play('shortAttack',50,false, true);
-    animAttack.onComplete.add(function(){
-        this.attacking = false;
-        this.visible = true;
-    }, this);
-    
+        var sprAttack;
+
+        switch(this.direction){
+            case 3:
+                sprAttack = this.game.add.sprite(this.centerX,this.centerY,'attack_front');
+                break;
+
+            case 10:
+                sprAttack = this.game.add.sprite(this.centerX,this.centerY,'attack_back');
+                break;
+
+            case 17:
+            case 24:
+                sprAttack = this.game.add.sprite(this.centerX,this.centerY,'attack_right');
+                break;
+
+        }
+        sprAttack.anchor.setTo(.5);
+        var animAttack = this.direction == 3 ? sprAttack.animations.add('shortAttack',[0,1,2,3,4,5]) : sprAttack.animations.add('shortAttack',[0,1,2,3,4,5,6,7,8]);
+
+        if(this.direction == 24) sprAttack.scale.x *= -1;
+        //sprAttack.anchor.setTo(.5);
+        sprAttack.animations.play('shortAttack',50,false, true);
+        animAttack.onComplete.add(function(){
+            this.attacking = false;
+            this.visible = true;
+        }, this);
+    }
 }
 
 zelda.link_prefab.prototype.throwObject = function(){
-    
-    this.object.state = 2;
-    
-    switch(this.direction){
-        case 3: //front=3
-            this.object.body.velocity.setTo(0,this.throwForce);
-            break;
-        case 10: //back=10
-            this.object.body.velocity.setTo(0,-this.throwForce);
-            break;
-        case 17: //right=17
-            this.object.body.velocity.setTo(this.throwForce,0);
-            break;
-        case 24: //left=24
-            this.object.body.velocity.setTo(-this.throwForce,0);
-            break;
+    if(this.canMove){
+        this.object.state = 2;
+
+        switch(this.direction){
+            case 3: //front=3
+                this.object.body.velocity.setTo(0,this.throwForce);
+                break;
+            case 10: //back=10
+                this.object.body.velocity.setTo(0,-this.throwForce);
+                break;
+            case 17: //right=17
+                this.object.body.velocity.setTo(this.throwForce,0);
+                break;
+            case 24: //left=24
+                this.object.body.velocity.setTo(-this.throwForce,0);
+                break;
+        }
+
+        //this.object = null;
     }
-    
-    //this.object = null;
-    
 }
