@@ -3,9 +3,7 @@
  <tileset firstgid="1" name="fondo_zona_2" tilewidth="8" tileheight="8" tilecount="16384" columns="128">
   <image source="Fondo_zona_2.png" width="1024" height="1024"/>
  </tileset>
- <tileset firstgid="16385" name="collision" tilewidth="8" tileheight="8" tilecount="1" columns="1">
-  <image source="../MAPA 1/collision.png" width="8" height="8"/>
- </tileset>
+ <tileset firstgid="16385" source="collision.tsx"/>
  <tileset firstgid="16386" name="bush" tilewidth="8" tileheight="8" tilecount="4" columns="2">
   <image source="BUSH.png" width="16" height="16"/>
  </tileset>
