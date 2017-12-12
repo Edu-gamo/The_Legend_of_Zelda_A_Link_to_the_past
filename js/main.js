@@ -3,7 +3,7 @@ var zelda = zelda || {};
 var gameOptions = {
     gameWidth:256,
     gameHeight:224,
-    linkSpeed:300,//100,
+    linkSpeed:100,
     inventariSpeed:500//400
 };
 

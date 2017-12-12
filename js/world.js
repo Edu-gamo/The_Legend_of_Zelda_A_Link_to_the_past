@@ -71,7 +71,7 @@ zelda.world = {
         
         //------------------------------TESTING---------------------------------
         this.link.checkWorldBounds=true;
-        this.link.events.onOutOfBounds.add(this.changeZone,this,0);
+        //this.link.events.onEnterBounds.add(this.changeZone,this);
         this.link.zone = 0; //0 = house, 1 = left, 2 = castle
         this.changingZone = false;
         this.space = zelda.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
@@ -95,49 +95,13 @@ zelda.world = {
             
             
         }
-        if(this.changingZone){
-            //this.camera.x -= 1; //moure la camara a on toqui
-            //al cap de un segon{ camera.follow i world.setBounds}
-        }else{
+            this.changeZone();
             this.setHudValues();
             this.HUD.frame = Number(this.HUD.isInDungeon);
 
             //inventari
-            if(this.enter.isDown && this.enter.downDuration(1) && !this.game.tweens.isTweening(this.HUD)){
-                
-                if(!this.showInventari){
-                    this.link.canMove = false;
-                    this.showInventari = true;                    
-                    //desattach el hud de la camara
-                    this.HUD.fixedToCamera = false;
-                    this.INVENTORY.fixedToCamera = false;
-
-                    //tween de l'inventari i hud
-                    this.game.add.tween(this.HUD).to({y: this.HUD.y+224},gameOptions.inventariSpeed,null,true);
-                    this.game.add.tween(this.INVENTORY).to({y: this.HUD.y+224},gameOptions.inventariSpeed,null,true);
-                    
-                    //tween on complete inputs de l'inventari
-                }
-                else if(this.showInventari){
-                    //tween de l'inventari i hud
-                    this.game.add.tween(this.HUD)
-                        .to({y: this.HUD.y-224},gameOptions.inventariSpeed,null,true)
-                        .onComplete.add(function() {
-                            arguments[0].fixedToCamera = true;
-                            this.showInventari = false;
-                            this.link.canMove = true;
-                        },this,this.showInventari,this.link);
-                  
-                    this.game.add.tween(this.INVENTORY)
-                        .to({y: this.HUD.y-224},gameOptions.inventariSpeed,null,true)
-                        .onComplete.add(function() {
-                            arguments[0].fixedToCamera = true;
-                        });
-
-
-                }
-            }
-        }
+            this.inventoryManager();
+        
     },
     
     setHudValues:function(){ //set magic bar, item Selected, number of rupies etc, hp...
@@ -201,26 +165,16 @@ zelda.world = {
     },
     
     changeZone:function(){
-        
-                    
-//            this.game.add.tween(this.camera)
-//                        .to({x: this.camera.x-20},1000,null,true)
-//                        .onComplete.add(function() {
-//                            //arguments[0].fixedToCamera = true;
-//                        });
-        
-        //console.log("out of bounds");
-        //this.changingZone = true;
-        this.link.canMove = false;
-        this.camera.target = null;
-//        this.camera.setBoundsToWorld();
-        this.world.setBounds(0,0,1024,1536);
+        var newLinkZone;
+        var boundsRect = this.world.bounds;
         
         
-        if(this.link.position.y < 1024) {
-            this.link.zone = 2;
-            console.log("hola");
-            //moure la camara
+        //comprova outOfBounds
+        if(this.link.top <= boundsRect.y){
+            console.log("top collides");
+            this.link.canMove = false;
+            this.camera.target = null;
+            this.world.setBounds(0,0,1024,1536);
             this.game.add.tween(this.camera)
                         .to({y: this.camera.y-224},1000,null,true)
                         .onComplete.add(function() {
@@ -228,30 +182,89 @@ zelda.world = {
                             this.link.canMove = true;
                             this.world.setBounds(0,0,1024,1024);
                         },this,this.link);
+            this.game.add.tween(this.link).to({y: this.link.y-this.link.height},500,null,true,200);
         }
-        else if(this.link.position.x < 512){
-            this.link.zone = 1;
-            //moure la camara
+        else if(this.link.bottom >= boundsRect.y+boundsRect.height){
+            console.log("bot collides");
+            this.link.canMove = false;
+            this.camera.target = null;
+            this.world.setBounds(0,0,1024,1536);
+            this.game.add.tween(this.camera)
+                        .to({y: this.camera.y+224},1000,null,true)
+                        .onComplete.add(function() {
+                            arguments[0].follow(this.link);
+                            this.link.canMove = true;
+                            if(this.link.x <512) zelda.game.world.setBounds(0,1024,512,512);
+                            else zelda.game.world.setBounds(512,1024,512,512);                            
+                        },this,this.link);
+            this.game.add.tween(this.link).to({y: this.link.y+this.link.height},500,null,true,200);
         }
-        else{ 
-            this.link.zone = 0;
-            //moure la camara
-            this.link.canMove = true;
-            this.camera.target =this.link;
+        else if(this.link.right>= boundsRect.x+boundsRect.width){
+            console.log("right collides");
+            this.link.canMove = false;
+            this.camera.target = null;
+            this.world.setBounds(0,0,1024,1536);
+            this.game.add.tween(this.camera)
+                        .to({x: this.camera.x+256},1000,null,true)
+                        .onComplete.add(function() {
+                            arguments[0].follow(this.link);
+                            this.link.canMove = true;
+                            this.world.setBounds(512,1024,512,512);
+                        },this,this.link);
+            this.game.add.tween(this.link).to({x: this.link.x+this.link.width},500,null,true,200);
+        }
+        else if(this.link.left <= boundsRect.x){
+            console.log("left collides");
+            this.link.canMove = false;
+            this.camera.target = null;
+            this.world.setBounds(0,0,1024,1536);
+            this.game.add.tween(this.camera)
+                        .to({x: this.camera.x-256},1000,null,true)
+                        .onComplete.add(function() {
+                            arguments[0].follow(this.link);
+                            this.link.canMove = true;
+                            this.world.setBounds(0,1024,512,512);
+                        },this,this.link);
+            this.game.add.tween(this.link).to({x: this.link.x-this.link.width},500,null,true,200);
         }
         
-        
+    },
+    
+    inventoryManager:function(){
+        if(this.enter.isDown && this.enter.downDuration(1) && !this.game.tweens.isTweening(this.HUD)){
+                
+                if(!this.showInventari){
+                    this.link.canMove = false;
+                    this.showInventari = true;                    
+                    //desattach el hud de la camara
+                    this.HUD.fixedToCamera = false;
+                    this.INVENTORY.fixedToCamera = false;
 
-        //aixo fora
-        if(this.link.zone == 0){
-            zelda.game.world.setBounds(512,1024,512,512);
-        }
-        if(this.link.zone == 1){
-            zelda.game.world.setBounds(0,1024,512,512);
-        }
-//        if(this.link.zone == 2){
-//            zelda.game.world.setBounds(0,0,1024,1024);
-//        }
+                    //tween de l'inventari i hud
+                    this.game.add.tween(this.HUD).to({y: this.HUD.y+224},gameOptions.inventariSpeed,null,true);
+                    this.game.add.tween(this.INVENTORY).to({y: this.HUD.y+224},gameOptions.inventariSpeed,null,true);
+                    
+                    //tween on complete inputs de l'inventari
+                }
+                else if(this.showInventari){
+                    //tween de l'inventari i hud
+                    this.game.add.tween(this.HUD)
+                        .to({y: this.HUD.y-224},gameOptions.inventariSpeed,null,true)
+                        .onComplete.add(function() {
+                            arguments[0].fixedToCamera = true;
+                            this.showInventari = false;
+                            this.link.canMove = true;
+                        },this,this.showInventari,this.link);
+                  
+                    this.game.add.tween(this.INVENTORY)
+                        .to({y: this.HUD.y-224},gameOptions.inventariSpeed,null,true)
+                        .onComplete.add(function() {
+                            arguments[0].fixedToCamera = true;
+                        });
+
+
+                }
+            }
     }
     
 };

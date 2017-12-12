@@ -193,6 +193,7 @@ zelda.level1 = {
     update:function(){
         this.setHudValues();
         this.HUD.frame = Number(this.HUD.isInDungeon);
+        this.inventoryManager();
         
     },
     setHudValues:function(){ //set magic bar, item Selected, number of rupies etc, hp...
@@ -253,6 +254,43 @@ zelda.level1 = {
         //i.scale.setTo(2);
         i.fixedToCamera = true;
         
+    },
+    
+    inventoryManager:function(){
+        if(this.enter.isDown && this.enter.downDuration(1) && !this.game.tweens.isTweening(this.HUD)){
+                
+                if(!this.showInventari){
+                    this.link.canMove = false;
+                    this.showInventari = true;                    
+                    //desattach el hud de la camara
+                    this.HUD.fixedToCamera = false;
+                    this.INVENTORY.fixedToCamera = false;
+
+                    //tween de l'inventari i hud
+                    this.game.add.tween(this.HUD).to({y: this.HUD.y+224},gameOptions.inventariSpeed,null,true);
+                    this.game.add.tween(this.INVENTORY).to({y: this.HUD.y+224},gameOptions.inventariSpeed,null,true);
+                    
+                    //tween on complete inputs de l'inventari
+                }
+                else if(this.showInventari){
+                    //tween de l'inventari i hud
+                    this.game.add.tween(this.HUD)
+                        .to({y: this.HUD.y-224},gameOptions.inventariSpeed,null,true)
+                        .onComplete.add(function() {
+                            arguments[0].fixedToCamera = true;
+                            this.showInventari = false;
+                            this.link.canMove = true;
+                        },this,this.showInventari,this.link);
+                  
+                    this.game.add.tween(this.INVENTORY)
+                        .to({y: this.HUD.y-224},gameOptions.inventariSpeed,null,true)
+                        .onComplete.add(function() {
+                            arguments[0].fixedToCamera = true;
+                        });
+
+
+                }
+            }
     }
     
 };
