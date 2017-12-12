@@ -60,8 +60,9 @@ zelda.menu = {
         this.indicadorDePartidaGuardada_link = zelda.game.add.sprite(-50,-50,'normal_walk_stand');
         this.indicadorDePartidaGuardada_link.frame = 3;
         //this.indicadorDePartidaGuardada_link.visible = false;
-        
         this.nomPartides = ['','','']; //els nomes de les 3 partides
+        
+        this.specialOption = null;
         
         //REGISTER PLAYER SCREEN
         lh = zelda.game.add.sprite(0,136,'lh');
@@ -130,10 +131,13 @@ zelda.menu = {
                             case 3:
                                 //copy player
                                 console.log("case 3");
+                                this.specialOption = "copy";
+                                
                                 break;
                             case 4:
                                 //erase player
                                 console.log('case4');
+                                this.specialOption = "erase";
                                 break;
                             default:
                                 if(this.nomPartides[this.registerOption] != ''){

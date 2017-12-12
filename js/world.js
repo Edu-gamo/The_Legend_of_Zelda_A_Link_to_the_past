@@ -91,6 +91,7 @@ zelda.world = {
         this.boomerangInv = this.INVENTORY.create(56,31-224,'items',3);
         this.bombInv = this.INVENTORY.create(104,31-224,'items',2);     
         this.cursors = this.game.input.keyboard.createCursorKeys();
+        this.itemNameInv = this.INVENTORY.create(168,15-224,'itemName',3);
         
         
     },
@@ -300,6 +301,7 @@ zelda.world = {
                             this.link.itemSelected = "lamp";
                             this.item.frame = 1;
                         }
+                        this.itemNameInv.frame = 0;
                         
                         break;
                     case 1:
@@ -309,6 +311,7 @@ zelda.world = {
                             this.link.itemSelected = "boomerang";
                             this.item.frame = 3;
                         }
+                        this.itemNameInv.frame = 2;
                         break;
                     case 2:
                         this.greenCircle.x = (this.bombInv.x-8);
@@ -317,6 +320,7 @@ zelda.world = {
                             this.link.itemSelected = "bomb";
                             this.item.frame = 2;
                         }
+                        this.itemNameInv.frame = 1;
                         break;
                 }
             }
