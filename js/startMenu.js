@@ -27,6 +27,12 @@ zelda.menu = {
         zelda.game.load.image('cor','img/corIndicador.png');
         zelda.game.load.image('bCurtain','img/blackCurtain.png');
         
+        //AUDIO
+        zelda.game.load.audio('musicaMenu','audio/11.select_screen.mp3');
+        zelda.game.load.audio('musicaLevel1','audio/03.time of the falling rain.mp3');
+        zelda.game.load.audio('menuCursor','audio/LTTP_Menu_Cursor.wav');
+//        zelda.game.load.audio();
+        
     },
     
     create:function(){
@@ -82,6 +88,11 @@ zelda.menu = {
         corIndex = zelda.game.add.sprite(31,87,'cor'); //cor indicador de index
         corIndex.visible = false;
         
+        //AUDIO
+        bgMusicMenu = zelda.game.add.audio('musicaMenu',gameOptions.volume,true);
+        bgMusicLevel1 = zelda.game.add.audio('musicaLevel1',gameOptions.volume,true);
+        menuCursorSound = zelda.game.add.audio('menuCursor',gameOptions.volume);
+        menuCursorSound.override = true;
 
         
     },
@@ -92,6 +103,7 @@ zelda.menu = {
                 if((enter.isDown && enter.downDuration(1)) || (xKey.isDown && xKey.downDuration(1))){
                     menuState = 'select';
                     bg_img.destroy();
+                    bgMusicMenu.play();
                     
                 }
                 break;
@@ -141,7 +153,14 @@ zelda.menu = {
                                 break;
                             default:
                                 if(this.nomPartides[this.registerOption] != ''){
-                                    zelda.game.state.start('level1'); //comença a jugar en la primera partida
+                                    curtain.bringToTop();
+                                    bgMusicMenu.fadeOut(700);
+                                    bgMusicMenu.onFadeComplete.addOnce(function(){
+                                        console.log("fadeOutComplete!");
+                                        bgMusicMenu.stop();
+                                        bgMusicLevel1.play();
+                                        zelda.game.state.start('level1');
+                                        }); //comença a jugar en la primera partida
                                 }else{//la partida no esta creada
                                     menuState = 'register';
                                     this.fairy.visible = false;
@@ -263,6 +282,8 @@ zelda.menu = {
         if(this.registerOption == 4){
             this.fairy.y = 190;
         }
+        
+        menuCursorSound.play();
     }
     
     
