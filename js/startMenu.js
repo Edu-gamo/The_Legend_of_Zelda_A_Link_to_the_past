@@ -92,7 +92,6 @@ zelda.menu = {
         bgMusicMenu = zelda.game.add.audio('musicaMenu',gameOptions.volume,true);
         bgMusicLevel1 = zelda.game.add.audio('musicaLevel1',gameOptions.volume,true);
         menuCursorSound = zelda.game.add.audio('menuCursor',gameOptions.volume);
-        menuCursorSound.override = true;
 
         
     },
@@ -132,11 +131,12 @@ zelda.menu = {
                     if(cursors.up.isDown && cursors.up.downDuration(1)){
                         this.registerOption -= 1;
                         if(this.registerOption < 0) this.registerOption = 4;
+                        this.placeFairyIndicator(); //moure fada
                     }else if(cursors.down.isDown && cursors.down.downDuration(1)){
                         this.registerOption += 1;
                         if(this.registerOption > 4) this.registerOption = 0;
+                        this.placeFairyIndicator(); //moure fada
                     }
-                    this.placeFairyIndicator(); //moure fada
                     
                     if((enter.isDown && enter.downDuration(1)) || (xKey.isDown && xKey.downDuration(1))){
                         switch(this.registerOption){
