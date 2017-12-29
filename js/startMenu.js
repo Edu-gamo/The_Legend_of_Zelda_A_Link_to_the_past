@@ -31,7 +31,10 @@ zelda.menu = {
         zelda.game.load.audio('musicaMenu','audio/11.select_screen.mp3');
         zelda.game.load.audio('musicaLevel1','audio/03.time of the falling rain.mp3');
         zelda.game.load.audio('menuCursor','audio/LTTP_Menu_Cursor.wav');
-//        zelda.game.load.audio();
+        zelda.game.load.audio('selectSound','audio/LTTP_Menu_Select.wav');
+        zelda.game.load.audio('selectLetterSound','audio/LTTP_LowHealth.wav');
+        zelda.game.load.audio('errorSound','audio/LTTP_Error.wav');
+        zelda.game.load.audio('eraseSound','audio/LTTP_Menu_Erase.wav');
         
     },
     
@@ -92,7 +95,11 @@ zelda.menu = {
         bgMusicMenu = zelda.game.add.audio('musicaMenu',gameOptions.volume,true);
         bgMusicLevel1 = zelda.game.add.audio('musicaLevel1',gameOptions.volume,true);
         menuCursorSound = zelda.game.add.audio('menuCursor',gameOptions.volume);
-
+        selectSound = zelda.game.add.audio('selectSound',gameOptions.volume);
+        selectLetterSound = zelda.game.add.audio('selectLetterSound',gameOptions.volume);
+        errorSound = zelda.game.add.audio('errorSound',gameOptions.volume);
+        eraseSound = zelda.game.add.audio('eraseSound',gameOptions.volume);
+        
         
     },
     
@@ -142,16 +149,28 @@ zelda.menu = {
                         switch(this.registerOption){
                             case 3:
                                 //copy player
-                                console.log("case 3");
-                                this.specialOption = "copy";
+                                if(this.nomPartides[0]==''&&this.nomPartides[1]==''&&this.nomPartides[2]==''){
+                                    errorSound.play();
+                                }else{
+                                    selectSound.play();
+                                    console.log("case 3");
+                                    this.specialOption = "copy";
+                                }
                                 
                                 break;
                             case 4:
                                 //erase player
-                                console.log('case4');
-                                this.specialOption = "erase";
+                                if(this.nomPartides[0]==''&&this.nomPartides[1]==''&&this.nomPartides[2]==''){
+                                    errorSound.play();
+                                }else{
+                                    selectSound.play();
+                                    console.log('case4');
+                                    this.specialOption = "erase";
+                                }
+                                
                                 break;
                             default:
+                                selectSound.play();
                                 if(this.nomPartides[this.registerOption] != ''){
                                     curtain.bringToTop();
                                     bgMusicMenu.fadeOut(700);
@@ -204,13 +223,17 @@ zelda.menu = {
                             var c = keyboardJ*32 + keyboardI;
                             word[wordIndex] = rfs.charAt(c);
                             wordIndex++;
+                            selectLetterSound.play();
                         }else{
                             if(keyboardI == 5 || keyboardI == 17 || keyboardI == 24){
                                 wordIndex--;
+                                selectLetterSound.play();
                             }else if(keyboardI == 6 || keyboardI==18 || keyboardI==25){
                                 wordIndex++;
+                                selectLetterSound.play();
                             }else if(keyboardI==8 || keyboardI==9 || keyboardI==20 || keyboardI==21 || keyboardI==27 || keyboardI==28){
-                                if(font.text != '      '){
+                                if(font.text != '      '){ 
+                                    selectSound.play(); //nombre valido
                                     console.log('return to playerSelect with name: ' + font.text); 
                                     this.nomPartides[this.registerOption] = font.text; //toString?
                                     menuState = 'select';
@@ -220,6 +243,8 @@ zelda.menu = {
                                     lh.visible = false; lv.visible = false;
                                     virtualKeyboard.visible = false;
                                     corIndex.visible = false;
+                                }else{
+                                    errorSound.play(); //nombre no valido
                                 }
                                 
                                 
@@ -227,6 +252,7 @@ zelda.menu = {
                             }else{
                                 word[wordIndex] = ' ';
                                 wordIndex++;
+                                selectLetterSound.play();
                             }
                         }
                         font.text = '';
