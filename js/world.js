@@ -34,6 +34,8 @@ zelda.world = {
         this.load.image('inventari','img/inventari.png');
         this.load.spritesheet('itemName','img/objecteSeleccionat_inventari.png',80,48); //lamp, bomb, boomerang, empty
         this.load.spritesheet('greenCircle_inv','img/cercleVerd.png',32,32);
+        this.load.spritesheet('lampFire','img/lampFire.png',16,16);
+        this.load.image('boomerang','img/boomerang.png');
         
         
                
@@ -308,19 +310,19 @@ zelda.world = {
                         this.greenCircle.x = (this.boomerangInv.x-8);
                         this.greenCircle.y = (this.boomerangInv.y-8);
                         if(this.enter.isDown && this.enter.downDuration(1)) {
-                            this.link.itemSelected = "boomerang";
+                            this.link.itemSelected = "bomb";
                             this.item.frame = 3;
                         }
-                        this.itemNameInv.frame = 2;
+                        this.itemNameInv.frame = 1;
                         break;
                     case 2:
                         this.greenCircle.x = (this.bombInv.x-8);
                         this.greenCircle.y = (this.bombInv.y-8);
                         if(this.enter.isDown && this.enter.downDuration(1)) {
-                            this.link.itemSelected = "bomb";
+                            this.link.itemSelected = "boomerang";
                             this.item.frame = 2;
                         }
-                        this.itemNameInv.frame = 1;
+                        this.itemNameInv.frame = 2;
                         break;
                 }
             }

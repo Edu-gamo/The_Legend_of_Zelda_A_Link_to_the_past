@@ -12,7 +12,7 @@ zelda.link_prefab = function(game, x, y, level){
     this.direction = 3; //front=3,back=10,right=17,left=24;
     this.hasWeapon = false;
     this.attacking = false;
-    this.itemSelected = null; //lamp=1, boomerang=2, bomb=3
+    this.itemSelected = null; //lamp, boomerang, bomb
     this.itemsAvailable = ["lamp","boomerang","bomb"]; //bomb, lamp, boomerang
     this.hearts = 3;
     this.health = 6; //cada enter es mig cor
@@ -35,6 +35,9 @@ zelda.link_prefab = function(game, x, y, level){
     //this.game = game;
     this.level = level
     
+    //items...
+    this.isBoomerangReady = true;
+    
     game.camera.follow(this,Phaser.Camera.FOLLOW_LOCKON);
     
     //INPUT
@@ -42,7 +45,7 @@ zelda.link_prefab = function(game, x, y, level){
     this.zKey = game.input.keyboard.addKey(Phaser.Keyboard.Z); //interactuar
     this.xKey = game.input.keyboard.addKey(Phaser.Keyboard.X); //atacar
     this.aKey = game.input.keyboard.addKey(Phaser.Keyboard.A); //mapa
-    this.sKey = game.input.keyboard.addKey(Phaser.Keyboard.S); //inventari
+    this.sKey = game.input.keyboard.addKey(Phaser.Keyboard.S); //item
     
     this.canGetObject = true;
     this.canMove = true; //para forzar que link no se pueda mover (pausa)
@@ -53,6 +56,11 @@ zelda.link_prefab.prototype = Object.create(Phaser.Sprite.prototype);
 //zelda.link_prefab.prototype.constructor = zelda.link_prefab;
 
 zelda.link_prefab.prototype.update = function(){
+    
+    //use item
+    if(this.sKey.isDown && this.sKey.downDuration(1)&&this.canMove){
+        this.useItem();
+    }
     
     if(this.zKey.isUp) this.canGetObject = true;
 
@@ -220,5 +228,57 @@ zelda.link_prefab.prototype.throwObject = function(){
         }
 
         //this.object = null;
+    }
+}
+
+zelda.link_prefab.prototype.useItem = function(){
+    //this.itemSelected = null; //lamp=1, boomerang=2, bomb=3
+    var magicCost;
+    if(!this.attacking){
+        if (this.itemSelected == 'lamp'){
+            magicCost = 2;
+            if(this.magic >= magicCost){
+                this.magic -= magicCost;
+                
+                var flameSprite = this.game.add.sprite(this.centerX, this.centerY, 'lampFire');
+                flameSprite.anchor.setTo(.5);
+                // 3fonrt,10back,17rght,24 left
+                var fireSpriteSeparation = 19;
+                if(this.direction==3) flameSprite.y += fireSpriteSeparation;
+                if(this.direction==10) flameSprite.y -= fireSpriteSeparation;
+                if(this.direction==17) flameSprite.x += fireSpriteSeparation;
+                if(this.direction==24) flameSprite.x -= fireSpriteSeparation;
+                flameSprite.animations.add('fireAnim',[0,1,2]);
+                flameSprite.animations.play('fireAnim',7,false,true);
+                
+                //sound
+                //llum
+                //encen antorches
+                
+            }
+        }
+        if(this.itemSelected == 'boomerang'){
+            if(this.isBoomerangReady){
+                this.isBoomerangReady = false;
+                var boomerang = this.game.add.sprite(this.centerX,this.centerY,'boomerang');
+                boomerang.anchor.setTo(.5);
+                boomerang.scale.setTo(0.8);
+                boomerangTweenRotation = this.game.add.tween(boomerang);
+                boomerangTweenRotation.to({angle: boomerang.angle + 360}, 700,null,true, 0,-1);
+                boomerangTweenPosition = this.game.add.tween(boomerang);
+                if(this.direction==3) boomerangTweenPosition.to({y: boomerang.y +100},500,null, true,10,0,true);
+                if(this.direction==10) boomerangTweenPosition.to({y: boomerang.y -100},500,null, true,10,0,true);
+                if(this.direction==17) boomerangTweenPosition.to({x: boomerang.x +100},500,null, true,10,0,true);
+                if(this.direction==24) boomerangTweenPosition.to({x: boomerang.x -100},500,null, true,10,0,true);
+                boomerangTweenPosition.onComplete.add(function() {
+                            
+                            boomerang.destroy();
+                            //boomerang rady
+                            this.isBoomerangReady = true;
+                        },this,boomerang,this.isBoomerangReady);
+                
+            }
+            
+        }
     }
 }
