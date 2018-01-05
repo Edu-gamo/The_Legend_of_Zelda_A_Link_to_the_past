@@ -8,7 +8,7 @@ zelda.world = {
         this.scale.setUserScale(2,2);
         this.scale.scaleMode = Phaser.ScaleManager.USER_SCALE; //or SHOW_ALL
         
-        
+        this.game.physics.startSystem(Phaser.Physics.ARCADE);
         
     },
     
@@ -21,7 +21,7 @@ zelda.world = {
         this.load.spritesheet('attack_back','img/link_ataque_basico_trasero_spritesheet.png',40,60);
         
         //bg
-        this.load.image('bg','img/fondoZelda.png');
+        //this.load.image('bg','img/fondoZelda.png');
         
         //hud
         this.load.spritesheet('HUD','img/HUD_2types.png',256,224);
@@ -37,15 +37,67 @@ zelda.world = {
         this.load.spritesheet('lampFire','img/lampFire.png',16,16);
         this.load.image('boomerang','img/boomerang.png');
         
+        //Tilemap
+        this.load.tilemap('exterior', 'EXTERIOR/exterior.json', null, Phaser.Tilemap.TILED_JSON);
+        
+        //Patrones tilemap
+        //this.load.image('CasaLink_bush', 'EXTERIOR/patrones/CasaLink_bush.png');
+        this.load.spritesheet('Bushes','EXTERIOR/patrones/Bushes.png',16,16);
+        this.load.image('CasaLink_collisions', 'EXTERIOR/patrones/CasaLink_collisions.png');
+        this.load.image('CasaLink_fondo', 'EXTERIOR/patrones/CasaLink_fondo.png');
+        this.load.image('CasaLink_top', 'EXTERIOR/patrones/CasaLink_top.png');
+        //this.load.image('Castillo_bush', 'EXTERIOR/patrones/Castillo_bush.png');
+        //this.load.image('Castillo_collisions', 'EXTERIOR/patrones/Castillo_collisions.png');
+        this.load.image('Castillo_fondo', 'EXTERIOR/patrones/Castillo_fondo.png');
+        this.load.image('Castillo_top', 'EXTERIOR/patrones/Castillo_top.png');
+        this.load.image('LateralCasa_fondo', 'EXTERIOR/patrones/LateralCasa_fondo.png');
         
                
     },
     
     create:function(){
-        this._bg = zelda.game.add.sprite(0,0,'bg');//----------------------------------------
+        //this._bg = zelda.game.add.sprite(0,0,'bg');//----------------------------------------
+        
+        //Tilemap
+        this.map = this.game.add.tilemap('exterior');
+        //this.map.addTilesetImage('CasaLink_bush');
+        this.map.addTilesetImage('CasaLink_collisions');
+        this.map.addTilesetImage('CasaLink_fondo');
+        this.map.addTilesetImage('CasaLink_top');
+        //this.map.addTilesetImage('Castillo_bush');
+        //this.map.addTilesetImage('Castillo_collisions');
+        this.map.addTilesetImage('Castillo_fondo');
+        this.map.addTilesetImage('Castillo_top');
+        this.map.addTilesetImage('LateralCasa_fondo');
+        
+        this.walls = this.map.createLayer('collisions2');
+        this.map.setCollisionBetween(4097 ,4097, true, 'collisions2');
+        
+        this.map.createLayer('fondo_layer');
+        //this.map.createLayer('bushes');
+        
+        //Objetos del exterior
+        this.objects = this.game.add.group();
+        this.map.createFromObjects('bushes2', 85505, 'Bushes', 0, true, false, this.objects);
+        console.log(this.objects.length);
+        this.objects.forEach(function(obj){
+            zelda.game.physics.arcade.enable(obj);
+            obj.body.immovable = true;
+            obj.state = 0; //0 = en suelo, 1 = recogido, 2 = lanzado
+            ////////////////////////////////////////////////////
+            obj.collider = zelda.game.add.sprite(0, 0, null);
+            zelda.game.physics.arcade.enable(obj.collider);
+            obj.collider.body.setSize(obj.width*0.75, obj.height*0.75, obj.x+obj.width*0.125, obj.y+obj.height*0.125);
+            obj.collider.body.immovable = true;
+            ////////////////////////////////////////////////////
+        }, this);
+        
+        
         //Link
         this.link = new zelda.link_prefab(this.game, (256+512-64),(256+1024+16), this);
         this.game.add.existing(this.link);
+        
+        this.map.createLayer('top');//Pinta la layer top por encima de link
         
         //HUD
         this.HUD = this.game.add.group();
