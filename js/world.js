@@ -43,6 +43,8 @@ zelda.world = {
         //Patrones tilemap
         //this.load.image('CasaLink_bush', 'EXTERIOR/patrones/CasaLink_bush.png');
         this.load.spritesheet('Bushes','EXTERIOR/patrones/Bushes.png',16,16);
+        this.load.spritesheet('Cartel','EXTERIOR/patrones/Cartel.png',16,16);
+        this.load.spritesheet('Exit','EXTERIOR/patrones/Exit.png',16,16);
         this.load.image('CasaLink_collisions', 'EXTERIOR/patrones/CasaLink_collisions.png');
         this.load.image('CasaLink_fondo', 'EXTERIOR/patrones/CasaLink_fondo.png');
         this.load.image('CasaLink_top', 'EXTERIOR/patrones/CasaLink_top.png');
@@ -73,13 +75,24 @@ zelda.world = {
         this.walls = this.map.createLayer('collisions2');
         this.map.setCollisionBetween(4097 ,4097, true, 'collisions2');
         
+        //Entrada al castillo
+        this.exit = this.game.add.group();
+        this.map.createFromObjects('exit', 85509, 'Exit', 0, true, false, this.exit);
+        this.exit.forEach(function(out){
+            zelda.game.physics.arcade.enable(out);
+            out.body.immovable = true;
+            out.go = function(){
+                zelda.game.state.start('level1');
+            }
+        }, this);
+        
         this.map.createLayer('fondo_layer');
         //this.map.createLayer('bushes');
         
         //Objetos del exterior
         this.objects = this.game.add.group();
-        this.map.createFromObjects('bushes2', 85505, 'Bushes', 0, true, false, this.objects);
-        console.log(this.objects.length);
+        this.map.createFromObjects('objects', 85505, 'Bushes', 0, true, false, this.objects);
+        this.map.createFromObjects('objects', 85507, 'Cartel', 0, true, false, this.objects);
         this.objects.forEach(function(obj){
             zelda.game.physics.arcade.enable(obj);
             obj.body.immovable = true;
@@ -91,7 +104,6 @@ zelda.world = {
             obj.collider.body.immovable = true;
             ////////////////////////////////////////////////////
         }, this);
-        
         
         //Link
         this.link = new zelda.link_prefab(this.game, (256+512-64),(256+1024+16), this);

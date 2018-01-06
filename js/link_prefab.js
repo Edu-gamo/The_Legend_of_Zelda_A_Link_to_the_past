@@ -95,7 +95,7 @@ zelda.link_prefab.prototype.update = function(){
                 link.object = object;
                 object.state = 1;
                 object.bringToTop();
-                object.frame = 2;
+                object.frame = 1;
             }/*else{
                 zelda.game.physics.arcade.collide(link, object);
             }*/
@@ -112,8 +112,9 @@ zelda.link_prefab.prototype.update = function(){
     });
 
     //Overlap with exit
-    this.game.physics.arcade.overlap(this, this.level.exit, function(){
-        zelda.game.state.start('world');
+    this.game.physics.arcade.overlap(this, this.level.exit, function(link, exit){
+        //zelda.game.state.start('world');
+        exit.go();
     });
         
 }

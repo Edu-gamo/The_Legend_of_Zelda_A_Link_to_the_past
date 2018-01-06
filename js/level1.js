@@ -14,7 +14,7 @@ zelda.level1 = {
     preload:function(){
         
         //background
-        this.load.image('bg','img/link_house.png');
+        //this.load.image('bg','img/link_house.png');
         
         //walk spritesheets
         this.load.spritesheet('linkWalk_noShield','img/link_normal_walk_spritesheet.png',23.28,29);
@@ -26,16 +26,16 @@ zelda.level1 = {
         zelda.game.load.spritesheet('attack_back','img/link_ataque_basico_trasero_spritesheet.png',40,60);
         
         //house objects
-        this.load.image('mesa','img/mesa.png');
-        this.load.image('silla','img/silla.png');
+        //this.load.image('mesa','img/mesa.png');
+        //this.load.image('silla','img/silla.png');
         /*this.load.image('gerro','img/gerro.png');
         this.load.image('cofre','img/cofre.png');*/
-        this.load.image('cama','img/cama.png');
+        //this.load.image('cama','img/cama.png');
         
-        zelda.game.load.spritesheet('gerro','img/spr_gerro.png',16,16);
-        zelda.game.load.spritesheet('cofre','img/spr_cofre.png',16,16);
+        //zelda.game.load.spritesheet('gerro','img/spr_gerro.png',16,16);
+        //zelda.game.load.spritesheet('cofre','img/spr_cofre.png',16,16);
         
-        this.load.image('wall','img/invisible_wall.png');
+        //this.load.image('wall','img/invisible_wall.png');
         
         //HUD sprites
         this.load.spritesheet('HUD','img/HUD_2types.png',256,224);
@@ -48,17 +48,29 @@ zelda.level1 = {
         this.load.image('inventari','img/inventari.png');
         this.load.spritesheet('itemName','img/objecteSeleccionat_inventari.png',80,48); //lamp, bomb, boomerang, empty
         this.load.spritesheet('greenCircle_inv','img/cercleVerd.png',32,32);
+        
+        
+        //Tilemap
+        this.load.tilemap('casa_link', 'Interior_CasaLink/casa_link.json', null, Phaser.Tilemap.TILED_JSON);
+        
+        //Patrones tilemap
+        this.load.spritesheet('Exit','Interior_CasaLink/patrones/Exit.png',16,16);
+        this.load.spritesheet('spr_cofre','Interior_CasaLink/patrones/spr_cofre.png',16,16);
+        this.load.spritesheet('spr_gerro','Interior_CasaLink/patrones/spr_gerro.png',16,16);
+        this.load.image('Collision','Interior_CasaLink/patrones/Collision.png');
+        this.load.image('fondo', 'Interior_CasaLink/patrones/fondo.png');
+        
     },
     
     create:function(){
         
         //Bg
-        bg = zelda.game.add.sprite(0,0,'bg');
+        //bg = zelda.game.add.sprite(0,0,'bg');
         //bg.scale.setTo(2);
         
         //house level
         //s = silla, m = mesa pequeña, M = mesa grande, c = cofre, g=gerro, X = muro, L i R = muro puerta, e = exit
-        this.level = [
+        /*this.level = [
             'XXXXXXXXXXXXX',
             'Xgc         X',
             'Xg       s  X',
@@ -159,11 +171,64 @@ zelda.level1 = {
                         //out.scale.setTo(2);
                         this.game.physics.arcade.enable(out);
                         out.body.immovable = true;
+                        out.go = function(){
+                            zelda.game.state.start('world');
+                        }
                         this.exit.add(out);
                         break;
                 }
             }
-        }
+        }*/
+        
+        //Tilemap
+        this.map = this.game.add.tilemap('casa_link');
+        this.map.addTilesetImage('Collision');
+        this.map.addTilesetImage('fondo');
+        
+        this.walls = this.map.createLayer('collision');
+        this.map.setCollisionBetween(566 ,566, true, 'collision');
+        
+        //Salida
+        this.exit = this.game.add.group();
+        this.map.createFromObjects('exit', 561, 'Exit', 0, true, false, this.exit);
+        this.exit.forEach(function(out){
+            zelda.game.physics.arcade.enable(out);
+            out.body.immovable = true;
+            out.go = function(){
+                zelda.game.state.start('world');
+            }
+        }, this);
+        
+        this.map.createLayer('fondo');
+        
+        //Objetos
+        this.objects = this.game.add.group();
+        this.map.createFromObjects('objects', 564, 'spr_gerro', 0, true, false, this.objects);
+        this.objects.forEach(function(obj){
+            zelda.game.physics.arcade.enable(obj);
+            obj.body.immovable = true;
+            obj.state = 0; //0 = en suelo, 1 = recogido, 2 = lanzado
+            ////////////////////////////////////////////////////
+            obj.collider = zelda.game.add.sprite(0, 0, null);
+            zelda.game.physics.arcade.enable(obj.collider);
+            obj.collider.body.setSize(obj.width*0.75, obj.height*0.75, obj.x+obj.width*0.125, obj.y+obj.height*0.125);
+            obj.collider.body.immovable = true;
+            ////////////////////////////////////////////////////
+        }, this);
+        
+        //Cofre
+        this.cofres = this.game.add.group();
+        this.map.createFromObjects('chests', 562, 'spr_cofre', 0, true, false, this.cofres);
+        this.cofres.forEach(function(chest){
+            this.game.physics.arcade.enable(chest);
+            chest.body.immovable = true;
+            ////////////////////////////////////////////////////
+            chest.collider = this.game.add.sprite(0, 0, null);
+            this.game.physics.arcade.enable(chest.collider);
+            chest.collider.body.setSize(chest.width*0.75, chest.height*0.75, chest.x+chest.width*0.125, chest.y+chest.height*0.125);
+            chest.collider.body.immovable = true;
+            ////////////////////////////////////////////////////
+        }, this);
         
         //Link prefab
         this.link = new zelda.link_prefab(this.game, 100, 50, this);
