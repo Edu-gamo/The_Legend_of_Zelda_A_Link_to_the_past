@@ -80,7 +80,7 @@ zelda.link_prefab.prototype.update = function(){
 
     if(!this.attacking){
         this.movement();
-        if(((this.zKey.isDown && this.zKey.downDuration(1)) || (this.xKey.isDown && this.xKey.downDuration(1))) && this.object != null){
+        if(((this.zKey.isDown && this.zKey.downDuration(1)) || (this.xKey.isDown && this.xKey.downDuration(1))) && this.object != null && this.object.state == 1){
             this.throwObject();
             this.canGetObject = false;
         }else if(this.xKey.isDown && this.xKey.downDuration(1)){
@@ -92,17 +92,30 @@ zelda.link_prefab.prototype.update = function(){
     this.game.physics.arcade.collide(this, this.level.walls);
 
     //Collide with objects
-    //this.game.physics.arcade.collide(this, this.level.objects);
     this.game.physics.arcade.overlap(this, this.level.objects, function(link, object){
         if(object.state == 0){
-            if(link.zKey.isDown && link.zKey.downDuration(1) && link.object == null && link.canGetObject){
-                link.object = object;
-                object.state = 1;
-                object.bringToTop();
-                object.frame = 1;
-            }/*else{
-                zelda.game.physics.arcade.collide(link, object);
-            }*/
+            switch(link.direction){
+                case 3:
+                    if(object.body.hitTest(link.x, link.y+link.height/2)){
+                        link.getObject(object);
+                    }
+                    break;
+                case 10:
+                    if(object.body.hitTest(link.x, link.y-link.height/4)){
+                        link.getObject(object);
+                    }
+                    break;
+                case 17:
+                    if(object.body.hitTest(link.x+link.width/2, link.y)){
+                        link.getObject(object);
+                    }
+                    break;
+                case 24:
+                    if(object.body.hitTest(link.x-link.width/2, link.y)) {
+                        link.getObject(object);
+                    }
+                    break;
+            }
             zelda.game.physics.arcade.collide(link, object.collider);
         }
     });
@@ -211,6 +224,45 @@ zelda.link_prefab.prototype.attack = function(){
             this.attacking = false;
             this.visible = true;
         }, this);
+        
+        switch(this.direction){ //Crea un area de ataque dependiendo de la direccion
+            case 3:
+                this.attackArea = this.addChild(this.game.add.sprite(this.x-this.width/4, this.y+this.height/2.5, null));
+                this.game.physics.arcade.enable(this.attackArea);
+                this.attackArea.body.setSize(this.width/2, this.height/3);
+                break;
+            case 10:
+                this.attackArea = this.addChild(this.game.add.sprite(this.x-this.width/4, this.y-this.height/2.5, null));
+                this.game.physics.arcade.enable(this.attackArea);
+                this.attackArea.body.setSize(this.width/2, this.height/2.25);
+                break;
+            case 17:
+                this.attackArea = this.addChild(this.game.add.sprite(this.x+this.width/3, this.y+this.height/12, null));
+                this.game.physics.arcade.enable(this.attackArea);
+                this.attackArea.body.setSize(this.width/2, this.height/3);
+                break;
+            case 24:
+                this.attackArea = this.addChild(this.game.add.sprite(this.x-this.width/1.25, this.y+this.height/12, null));
+                this.game.physics.arcade.enable(this.attackArea);
+                this.attackArea.body.setSize(this.width/2, this.height/3);
+                break;
+        }
+        //this.game.debug.body(this.attackArea);
+        
+        //Destruye los objetos que esten dentro del area de ataque
+        this.game.physics.arcade.overlap(this.attackArea, this.level.objects, function(link, object){
+            link.parent.generatePickup(object.x+object.width/2,object.y+object.height/2);
+            object.kill();
+        });
+        
+    }
+}
+
+zelda.link_prefab.prototype.generatePickup = function(posX, posY){
+    var item = zelda.game.rnd.between(0,9);
+    if(item >= 6){
+        rupee = new zelda.rupee_prefab(this.game, posX, posY, this.level);
+        this.game.add.existing(rupee);
     }
 }
 
@@ -234,6 +286,15 @@ zelda.link_prefab.prototype.throwObject = function(){
         }
 
         //this.object = null;
+    }
+}
+
+zelda.link_prefab.prototype.getObject = function(object){
+    if(this.zKey.isDown && this.zKey.downDuration(1) && this.object == null && this.canGetObject){
+        this.object = object;
+        object.state = 1;
+        object.bringToTop();
+        object.frame = 1;
     }
 }
 
