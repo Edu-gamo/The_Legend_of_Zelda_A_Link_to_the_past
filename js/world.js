@@ -13,15 +13,16 @@ zelda.world = {
     },
     
     preload:function(){
+        //LINK
         //walk spritesheets
         this.load.spritesheet('linkWalk_noShield','img/link_normal_walk_spritesheet.png',23.28,29); this.load.spritesheet('linkWalk_Shield','img/link_shield_walk_spritesheet.png',23.28,29);
         //attack spritesheets
         this.load.spritesheet('attack_front','img/link_ataque_basico_frontal_spritesheet.png',39.83,40);
         this.load.spritesheet('attack_right','img/link_ataque_basico_lateral_spritesheet.png',48,48);
         this.load.spritesheet('attack_back','img/link_ataque_basico_trasero_spritesheet.png',40,60);
+        //otros
+        this.load.spritesheet('fall_entrance','img/caer_en_foso.png',32,32);
         
-        //bg
-        //this.load.image('bg','img/fondoZelda.png');
         
         //hud
         this.load.spritesheet('HUD','img/HUD_2types.png',256,224);
@@ -56,11 +57,17 @@ zelda.world = {
         
         //pickups
         this.load.spritesheet('rupeePickup','img/rupeePickup.png',8,16);
+        this.load.image('heartPickup','img/heartPickup.png');
         
-        //audio
+        //AUDIO
         zelda.game.load.audio('attackSound','audio/LTTP_Sword1.wav');
         zelda.game.load.audio('rupeeSound','audio/LTTP_Rupee1.wav');
-        zelda.game.load.audio('itemSound','audio/LTTP_Item.wav');
+        zelda.game.load.audio('pickupItemSound','audio/LTTP_Item.wav');
+        zelda.game.load.audio('lampSound','audio/LTTP_Lamp.wav');
+        zelda.game.load.audio('menuCursor','audio/LTTP_Menu_Cursor.wav');
+        zelda.game.load.audio('openInventory','audio/LTTP_Pause_Open.wav');
+        zelda.game.load.audio('closeInventory','audio/LTTP_Pause_Close.wav');
+        zelda.game.load.audio('boomerangSound','audio/LTTP_Boomerang.wav');
     },
     
     create:function(){
@@ -252,7 +259,7 @@ zelda.world = {
         
         //comprova outOfBounds
         if(this.link.top <= boundsRect.y){
-            console.log("top collides");
+//            console.log("top collides");
             this.link.canMove = false;
             this.camera.target = null;
             this.world.setBounds(0,0,1024,1536);
@@ -266,7 +273,7 @@ zelda.world = {
             this.game.add.tween(this.link).to({y: this.link.y-this.link.height},500,null,true,200);
         }
         else if(this.link.bottom >= boundsRect.y+boundsRect.height){
-            console.log("bot collides");
+//            console.log("bot collides");
             this.link.canMove = false;
             this.camera.target = null;
             this.world.setBounds(0,0,1024,1536);
@@ -281,7 +288,7 @@ zelda.world = {
             this.game.add.tween(this.link).to({y: this.link.y+this.link.height},500,null,true,200);
         }
         else if(this.link.right>= boundsRect.x+boundsRect.width){
-            console.log("right collides");
+//            console.log("right collides");
             this.link.canMove = false;
             this.camera.target = null;
             this.world.setBounds(0,0,1024,1536);
@@ -295,7 +302,7 @@ zelda.world = {
             this.game.add.tween(this.link).to({x: this.link.x+this.link.width},500,null,true,200);
         }
         else if(this.link.left <= boundsRect.x){
-            console.log("left collides");
+//            console.log("left collides");
             this.link.canMove = false;
             this.camera.target = null;
             this.world.setBounds(0,0,1024,1536);
@@ -323,7 +330,8 @@ zelda.world = {
                     //desattach el hud de la camara
                     this.HUD.fixedToCamera = false;
                     this.INVENTORY.fixedToCamera = false;
-
+                    this.link.pauseOpenSound.play();
+                    
                     //tween de l'inventari i hud
                     this.game.add.tween(this.HUD).to({y: this.HUD.y+224},gameOptions.inventariSpeed,null,true);
                     this.game.add.tween(this.INVENTORY).to({y: this.HUD.y+224},gameOptions.inventariSpeed,null,true);
@@ -331,6 +339,7 @@ zelda.world = {
                     //tween on complete inputs de l'inventari
                 }
                 else if(this.showInventari){
+                    this.link.pauseCloseSound.play();
                     //tween de l'inventari i hud
                     this.game.add.tween(this.HUD)
                         .to({y: this.HUD.y-224},gameOptions.inventariSpeed,null,true)
@@ -358,12 +367,14 @@ zelda.world = {
                     if(this.circleIndex == 3) this.circleIndex = 0;
                     this.greenCircle.animations.stop();
                     this.greenCircle.animations.play('intermitent');
+                    this.link.menuCursorSound.play();
                 }
                 if(this.cursors.left.isDown && this.cursors.left.downDuration(1)){
                     this.circleIndex --;
                     if(this.circleIndex == -1) this.circleIndex = 2;
                     this.greenCircle.animations.stop();
                     this.greenCircle.animations.play('intermitent');
+                    this.link.menuCursorSound.play();
                 }
                 
                 switch(this.circleIndex){
