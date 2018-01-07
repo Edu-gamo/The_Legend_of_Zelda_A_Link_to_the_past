@@ -7,7 +7,7 @@ zelda.link_prefab = function(game, x, y, level){
     
     game.physics.arcade.enable(this);
     //this.body.collideWorldBounds = true;
-    this.body.setSize(this.width, this.height/2, 0, this.height/2);
+    this.body.setSize(this.width-6, this.height/2, 3, this.height/2);
     
     this.direction = 3; //front=3,back=10,right=17,left=24;
     this.hasWeapon = false;
@@ -49,6 +49,10 @@ zelda.link_prefab = function(game, x, y, level){
     
     this.canGetObject = true;
     this.canMove = true; //para forzar que link no se pueda mover (pausa)
+    
+    //audio
+    this.attackSound = game.add.audio('attackSound',gameOptions.volume);
+    this.itemSound = game.add.audio('itemSound',gameOptions.volume);
     
 };
 
@@ -178,6 +182,7 @@ zelda.link_prefab.prototype.attack = function(){
         this.body.velocity.setTo(0, 0);
         this.animations.stop(true);
         this.visible = false;
+        this.attackSound.play();
 
         var sprAttack;
 
@@ -252,7 +257,7 @@ zelda.link_prefab.prototype.useItem = function(){
                 flameSprite.animations.add('fireAnim',[0,1,2]);
                 flameSprite.animations.play('fireAnim',7,false,true);
                 
-                //sound
+                this.itemSound.play();
                 //llum
                 //encen antorches
                 
@@ -263,7 +268,7 @@ zelda.link_prefab.prototype.useItem = function(){
                 this.isBoomerangReady = false;
                 var boomerang = this.game.add.sprite(this.centerX,this.centerY,'boomerang');
                 boomerang.anchor.setTo(.5);
-                boomerang.scale.setTo(0.8);
+//                boomerang.scale.setTo(0.8);
                 boomerangTweenRotation = this.game.add.tween(boomerang);
                 boomerangTweenRotation.to({angle: boomerang.angle + 360}, 700,null,true, 0,-1);
                 boomerangTweenPosition = this.game.add.tween(boomerang);

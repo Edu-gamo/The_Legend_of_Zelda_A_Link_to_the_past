@@ -48,7 +48,8 @@ zelda.level1 = {
         this.load.image('inventari','img/inventari.png');
         this.load.spritesheet('itemName','img/objecteSeleccionat_inventari.png',80,48); //lamp, bomb, boomerang, empty
         this.load.spritesheet('greenCircle_inv','img/cercleVerd.png',32,32);
-        
+        this.load.spritesheet('lampFire','img/lampFire.png',16,16);
+        this.load.image('boomerang','img/boomerang.png');
         
         //Tilemap
         this.load.tilemap('casa_link', 'Interior_CasaLink/casa_link.json', null, Phaser.Tilemap.TILED_JSON);
@@ -59,6 +60,14 @@ zelda.level1 = {
         this.load.spritesheet('spr_gerro','Interior_CasaLink/patrones/spr_gerro.png',16,16);
         this.load.image('Collision','Interior_CasaLink/patrones/Collision.png');
         this.load.image('fondo', 'Interior_CasaLink/patrones/fondo.png');
+        
+        //pickups
+        this.load.spritesheet('rupeePickup','img/rupeePickup.png',8,16);
+        
+        //audio
+        zelda.game.load.audio('attackSound','audio/LTTP_Sword1.wav');
+        zelda.game.load.audio('rupeeSound','audio/LTTP_Rupee1.wav');
+        zelda.game.load.audio('itemSound','audio/LTTP_Item.wav');
         
     },
     
@@ -277,6 +286,7 @@ zelda.level1 = {
         this.boomerangInv = this.INVENTORY.create(56,31-224,'items',3);
         this.bombInv = this.INVENTORY.create(104,31-224,'items',2);     
         this.cursors = this.game.input.keyboard.createCursorKeys();
+        this.itemNameInv = this.INVENTORY.create(168,15-224,'itemName',3);
         
     },
     
@@ -406,23 +416,26 @@ zelda.level1 = {
                             this.link.itemSelected = "lamp";
                             this.item.frame = 1;
                         }
+                        this.itemNameInv.frame = 0;
                         
                         break;
                     case 1:
                         this.greenCircle.x = (this.boomerangInv.x-8);
                         this.greenCircle.y = (this.boomerangInv.y-8);
                         if(this.enter.isDown && this.enter.downDuration(1)) {
-                            this.link.itemSelected = "boomerang";
+                            this.link.itemSelected = "bomb";
                             this.item.frame = 3;
                         }
+                        this.itemNameInv.frame = 1;
                         break;
                     case 2:
                         this.greenCircle.x = (this.bombInv.x-8);
                         this.greenCircle.y = (this.bombInv.y-8);
                         if(this.enter.isDown && this.enter.downDuration(1)) {
-                            this.link.itemSelected = "bomb";
+                            this.link.itemSelected = "boomerang";
                             this.item.frame = 2;
                         }
+                        this.itemNameInv.frame = 2;
                         break;
                 }
             }

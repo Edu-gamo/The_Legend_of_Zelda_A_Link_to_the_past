@@ -54,7 +54,13 @@ zelda.world = {
         this.load.image('Castillo_top', 'EXTERIOR/patrones/Castillo_top.png');
         this.load.image('LateralCasa_fondo', 'EXTERIOR/patrones/LateralCasa_fondo.png');
         
-               
+        //pickups
+        this.load.spritesheet('rupeePickup','img/rupeePickup.png',8,16);
+        
+        //audio
+        zelda.game.load.audio('attackSound','audio/LTTP_Sword1.wav');
+        zelda.game.load.audio('rupeeSound','audio/LTTP_Rupee1.wav');
+        zelda.game.load.audio('itemSound','audio/LTTP_Item.wav');
     },
     
     create:function(){
@@ -158,6 +164,7 @@ zelda.world = {
         this.bombInv = this.INVENTORY.create(104,31-224,'items',2);     
         this.cursors = this.game.input.keyboard.createCursorKeys();
         this.itemNameInv = this.INVENTORY.create(168,15-224,'itemName',3);
+        
         
         
     },
