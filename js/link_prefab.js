@@ -7,7 +7,7 @@ zelda.link_prefab = function(game, x, y, level){
     
     game.physics.arcade.enable(this);
     //this.body.collideWorldBounds = true;
-    this.body.setSize(this.width-6, this.height/2, 3, this.height/2);
+    this.body.setSize(this.width-6, this.height/2-4, 3, this.height/2+2);
     
     this.direction = 3; //front=3,back=10,right=17,left=24;
     this.hasWeapon = false;
@@ -24,6 +24,7 @@ zelda.link_prefab = function(game, x, y, level){
     this.object = null; //objeto recogido del entorno
     this.throwForce = 150; //velocidad con la que lanza el objeto
     
+    
     //game.load.spritesheet('linkWalk_Shield','img/link_shield_walk_spritesheet.png',23.28,29);
     if(this.hasWeapon) this.loadTexture('linkWalk_Shield'); //canviarho a un overlap amb les armes
     
@@ -32,7 +33,9 @@ zelda.link_prefab = function(game, x, y, level){
     this.animations.add('linkWalk_right',[14,15,16,17,18,19,20,19,18,17,16,15],30,true);
     this.animations.add('linkWalk_left',[21,22,23,24,25,26,27,26,25,24,23,22],30,true);
     
-    //this.game = game;
+    this.falling = false; //animation flag when exit
+    
+    this.game = game;
     this.level = level
     
     //items...
@@ -52,7 +55,10 @@ zelda.link_prefab = function(game, x, y, level){
     
     //audio
     this.attackSound = game.add.audio('attackSound',gameOptions.volume);
-    this.itemSound = game.add.audio('itemSound',gameOptions.volume);
+    this.lampSound = game.add.audio('lampSound',gameOptions.volume);
+    this.menuCursorSound = game.add.audio('menuCursor',gameOptions.volume);
+    this.pauseOpenSound = game.add.audio('openInventory',gameOptions.volume);
+    this.pauseCloseSound = game.add.audio('closeInventory',gameOptions.volume);
     
 };
 
@@ -118,8 +124,24 @@ zelda.link_prefab.prototype.update = function(){
     //Overlap with exit
     this.game.physics.arcade.overlap(this, this.level.exit, function(link, exit){
         //zelda.game.state.start('world');
-        exit.go();
-    });
+        if(this.level == zelda.world){
+            if(!this.falling){
+                this.falling = true;
+                this.visible = false;
+                var fallSprite = this.game.add.sprite(exit.centerX,exit.centerY,'fall_entrance');
+                fallSprite.anchor.setTo(0.5);
+                var fallAnim = fallSprite.animations.add('fall_anim',[0,1,2,3,4],4,false);
+                fallAnim.onComplete.add(function(){ exit.go(); },this);
+                fallSprite.animations.play('fall_anim');
+            }
+        }else{
+//            console.log('toWorld');
+            exit.go();
+        }
+        
+        
+        
+    },null, this);
         
 }
 
@@ -257,7 +279,7 @@ zelda.link_prefab.prototype.useItem = function(){
                 flameSprite.animations.add('fireAnim',[0,1,2]);
                 flameSprite.animations.play('fireAnim',7,false,true);
                 
-                this.itemSound.play();
+                this.lampSound.play();
                 //llum
                 //encen antorches
                 

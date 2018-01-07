@@ -63,11 +63,14 @@ zelda.level1 = {
         
         //pickups
         this.load.spritesheet('rupeePickup','img/rupeePickup.png',8,16);
+        this.load.image('heartPickup','img/heartPickup.png');
         
         //audio
         zelda.game.load.audio('attackSound','audio/LTTP_Sword1.wav');
         zelda.game.load.audio('rupeeSound','audio/LTTP_Rupee1.wav');
-        zelda.game.load.audio('itemSound','audio/LTTP_Item.wav');
+        zelda.game.load.audio('pickupItemSound','audio/LTTP_Item.wav');
+        zelda.game.load.audio('lampSound','audio/LTTP_Lamp.wav');
+        zelda.game.load.audio('menuCursor','audio/LTTP_Menu_Cursor.wav');
         
     },
     
@@ -365,6 +368,7 @@ zelda.level1 = {
                     //desattach el hud de la camara
                     this.HUD.fixedToCamera = false;
                     this.INVENTORY.fixedToCamera = false;
+                    this.link.pauseOpenSound.play();
 
                     //tween de l'inventari i hud
                     this.game.add.tween(this.HUD).to({y: this.HUD.y+224},gameOptions.inventariSpeed,null,true);
@@ -373,6 +377,7 @@ zelda.level1 = {
                     //tween on complete inputs de l'inventari
                 }
                 else if(this.showInventari){
+                    this.link.pauseCloseSound.play();
                     //tween de l'inventari i hud
                     this.game.add.tween(this.HUD)
                         .to({y: this.HUD.y-224},gameOptions.inventariSpeed,null,true)
@@ -400,12 +405,14 @@ zelda.level1 = {
                     if(this.circleIndex == 3) this.circleIndex = 0;
                     this.greenCircle.animations.stop();
                     this.greenCircle.animations.play('intermitent');
+                     this.link.menuCursorSound.play();
                 }
                 if(this.cursors.left.isDown && this.cursors.left.downDuration(1)){
                     this.circleIndex --;
                     if(this.circleIndex == -1) this.circleIndex = 2;
                     this.greenCircle.animations.stop();
                     this.greenCircle.animations.play('intermitent');
+                     this.link.menuCursorSound.play();
                 }
                 
                 switch(this.circleIndex){
