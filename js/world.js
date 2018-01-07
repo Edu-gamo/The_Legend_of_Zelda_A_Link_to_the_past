@@ -67,6 +67,7 @@ zelda.world = {
         zelda.game.load.audio('menuCursor','audio/LTTP_Menu_Cursor.wav');
         zelda.game.load.audio('openInventory','audio/LTTP_Pause_Open.wav');
         zelda.game.load.audio('closeInventory','audio/LTTP_Pause_Close.wav');
+        zelda.game.load.audio('boomerangSound','audio/LTTP_Boomerang.wav');
     },
     
     create:function(){

@@ -40,6 +40,8 @@ zelda.link_prefab = function(game, x, y, level){
     
     //items...
     this.isBoomerangReady = true;
+    this.boomerang;
+    this.boomerangReturning = false;
     
     game.camera.follow(this,Phaser.Camera.FOLLOW_LOCKON);
     
@@ -59,6 +61,7 @@ zelda.link_prefab = function(game, x, y, level){
     this.menuCursorSound = game.add.audio('menuCursor',gameOptions.volume);
     this.pauseOpenSound = game.add.audio('openInventory',gameOptions.volume);
     this.pauseCloseSound = game.add.audio('closeInventory',gameOptions.volume);
+    this.boomerangSound = game.add.audio('boomerangSound',gameOptions.volume,true);
     
 };
 
@@ -70,6 +73,21 @@ zelda.link_prefab.prototype.update = function(){
     //use item
     if(this.sKey.isDown && this.sKey.downDuration(1)&&this.canMove){
         this.useItem();
+    }
+    if(this.boomerangReturning){
+        var boomLinkDist = new Phaser.Point(this.centerX-this.boomerang.x,this.centerY-this.boomerang.y);
+        if(boomLinkDist.getMagnitude() < 10){
+            this.boomerang.destroy();
+            this.isBoomerangReady = true;
+            this.boomerangReturning = false;
+            this.boomerangSound.stop();
+            
+        }else{
+            boomLinkDist.normalize();
+            boomLinkDist.multiply(4,4);
+            this.boomerang.x += boomLinkDist.x;
+            this.boomerang.y += boomLinkDist.y;
+        }
     }
     
     if(this.zKey.isUp) this.canGetObject = true;
@@ -262,7 +280,7 @@ zelda.link_prefab.prototype.throwObject = function(){
 zelda.link_prefab.prototype.useItem = function(){
     //this.itemSelected = null; //lamp=1, boomerang=2, bomb=3
     var magicCost;
-    if(!this.attacking){
+    if(!this.attacking && this.object == null){
         if (this.itemSelected == 'lamp'){
             magicCost = 2;
             if(this.magic >= magicCost){
@@ -288,22 +306,24 @@ zelda.link_prefab.prototype.useItem = function(){
         if(this.itemSelected == 'boomerang'){
             if(this.isBoomerangReady){
                 this.isBoomerangReady = false;
-                var boomerang = this.game.add.sprite(this.centerX,this.centerY,'boomerang');
-                boomerang.anchor.setTo(.5);
+                this.boomerang = this.game.add.sprite(this.centerX,this.centerY,'boomerang');
+                this.boomerang.anchor.setTo(.5);
+                this.game.physics.arcade.enable(this.boomerang);
+                this.boomerangSound.play();
 //                boomerang.scale.setTo(0.8);
-                boomerangTweenRotation = this.game.add.tween(boomerang);
-                boomerangTweenRotation.to({angle: boomerang.angle + 360}, 700,null,true, 0,-1);
-                boomerangTweenPosition = this.game.add.tween(boomerang);
-                if(this.direction==3) boomerangTweenPosition.to({y: boomerang.y +100},500,null, true,10,0,true);
-                if(this.direction==10) boomerangTweenPosition.to({y: boomerang.y -100},500,null, true,10,0,true);
-                if(this.direction==17) boomerangTweenPosition.to({x: boomerang.x +100},500,null, true,10,0,true);
-                if(this.direction==24) boomerangTweenPosition.to({x: boomerang.x -100},500,null, true,10,0,true);
+                boomerangTweenRotation = this.game.add.tween(this.boomerang);
+                boomerangTweenRotation.to({angle: this.boomerang.angle + 360}, 600,null,true, 0,-1);
+                boomerangTweenPosition = this.game.add.tween(this.boomerang);
+                if(this.direction==3) boomerangTweenPosition.to({y: this.boomerang.y +100},450,null, true,10);
+                if(this.direction==10) boomerangTweenPosition.to({y: this.boomerang.y -100},450,null, true,10);
+                if(this.direction==17) boomerangTweenPosition.to({x: this.boomerang.x +100},450,null, true,10);
+                if(this.direction==24) boomerangTweenPosition.to({x: this.boomerang.x -100},450,null, true,10);
                 boomerangTweenPosition.onComplete.add(function() {
-                            
-                            boomerang.destroy();
+                            this.boomerangReturning = true;
+//                            boomerang.destroy();
                             //boomerang rady
-                            this.isBoomerangReady = true;
-                        },this,boomerang,this.isBoomerangReady);
+//                            this.isBoomerangReady = true;
+                        },this);
                 
             }
             

@@ -71,6 +71,7 @@ zelda.level1 = {
         zelda.game.load.audio('pickupItemSound','audio/LTTP_Item.wav');
         zelda.game.load.audio('lampSound','audio/LTTP_Lamp.wav');
         zelda.game.load.audio('menuCursor','audio/LTTP_Menu_Cursor.wav');
+        zelda.game.load.audio('boomerangSound','audio/LTTP_Boomerang.wav');
         
     },
     
