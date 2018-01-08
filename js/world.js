@@ -24,6 +24,7 @@ zelda.world = {
         this.load.spritesheet('fall_entrance','img/caer_en_foso.png',32,32);
         this.load.spritesheet('link_death','img/link_death.png',32,32);
         this.load.spritesheet('enemySoldier','img/enemySoldierRed.png',18,32);
+        zelda.game.load.image('bCurtain','img/blackCurtain.png');
         
         
         //hud

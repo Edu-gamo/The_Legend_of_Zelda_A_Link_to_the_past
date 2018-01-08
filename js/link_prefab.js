@@ -24,7 +24,7 @@ zelda.link_prefab = function(game, x, y, level){
     this.object = null; //objeto recogido del entorno
     this.throwForce = 150; //velocidad con la que lanza el objeto
     this.invulnerable = false;
-    
+    this.isDead = false;
     
     //game.load.spritesheet('linkWalk_Shield','img/link_shield_walk_spritesheet.png',23.28,29);
     if(this.hasWeapon) this.loadTexture('linkWalk_Shield'); //canviarho a un overlap amb les armes
@@ -33,7 +33,7 @@ zelda.link_prefab = function(game, x, y, level){
     this.animations.add('linkWalk_back',[7,8,9,10,11,12,13,12,11,10,9,8],30,true);
     this.animations.add('linkWalk_right',[14,15,16,17,18,19,20,19,18,17,16,15],30,true);
     this.animations.add('linkWalk_left',[21,22,23,24,25,26,27,26,25,24,23,22],30,true);
-    this.animations.add('voltesAlMorir',[3,24,10,17,3,24,10,17,3,24,10,17,3,24,10,17],5);
+    this.animations.add('voltesAlMorir',[3,24,10,17,3,24,10,17],15);
     
 //    this.deathSpriteAux = game.add.sprite(-50,-50,'linkWalk_noShield');
 //    this.deathSpriteAux.animations.add('voltesAlMorir',[3,24,10,17,3,24,10,17,3,24,10,17,3,24,10,17],5);
@@ -79,113 +79,112 @@ zelda.link_prefab.prototype = Object.create(Phaser.Sprite.prototype);
 
 zelda.link_prefab.prototype.update = function(){
     
-    //use item
-    if(this.sKey.isDown && this.sKey.downDuration(1)&&this.canMove){
-        this.useItem();
-    }
-    if(this.boomerangReturning){
-        var boomLinkDist = new Phaser.Point(this.centerX-this.boomerang.x,this.centerY-this.boomerang.y);
-        if(boomLinkDist.getMagnitude() < 10){
-            this.boomerang.destroy();
-            this.isBoomerangReady = true;
-            this.boomerangReturning = false;
-            this.boomerangSound.stop();
-            
-        }else{
-            boomLinkDist.normalize();
-            boomLinkDist.multiply(4,4);
-            this.boomerang.x += boomLinkDist.x;
-            this.boomerang.y += boomLinkDist.y;
+    if(!this.isDead){
+        //use item
+        if(this.sKey.isDown && this.sKey.downDuration(1)&&this.canMove){
+            this.useItem();
         }
-    }
-    
-    if(this.zKey.isUp) this.canGetObject = true;
+        if(this.boomerangReturning){
+            var boomLinkDist = new Phaser.Point(this.centerX-this.boomerang.x,this.centerY-this.boomerang.y);
+            if(boomLinkDist.getMagnitude() < 10){
+                this.boomerang.destroy();
+                this.isBoomerangReady = true;
+                this.boomerangReturning = false;
+                this.boomerangSound.stop();
 
-    if(this.object != null){
-        if(this.object.state == 1){
-            this.object.position.setTo(this.position.x-this.object.width/2, this.position.y-this.height);
-        }else if(Math.abs(this.object.x - this.x)+Math.abs(this.object.y - this.y) > this.width*4){
-            //Pintar efecto de destruccion
-            this.object.kill();
-            this.object = null;
-        }
-    }
-
-    if(!this.attacking){
-        this.movement();
-        if(((this.zKey.isDown && this.zKey.downDuration(1)) || (this.xKey.isDown && this.xKey.downDuration(1))) && this.object != null && this.object.state == 1){
-            this.throwObject();
-            this.canGetObject = false;
-        }else if(this.xKey.isDown && this.xKey.downDuration(1)){
-            this.attack();
-        }
-    }
-
-    //Collide with walls
-    this.game.physics.arcade.collide(this, this.level.walls);
-
-    //Collide with objects
-    this.game.physics.arcade.overlap(this, this.level.objects, function(link, object){
-        if(object.state == 0){
-            switch(link.direction){
-                case 3:
-                    if(object.body.hitTest(link.x, link.y+link.height/2)){
-                        link.getObject(object);
-                    }
-                    break;
-                case 10:
-                    if(object.body.hitTest(link.x, link.y-link.height/4)){
-                        link.getObject(object);
-                    }
-                    break;
-                case 17:
-                    if(object.body.hitTest(link.x+link.width/2, link.y)){
-                        link.getObject(object);
-                    }
-                    break;
-                case 24:
-                    if(object.body.hitTest(link.x-link.width/2, link.y)) {
-                        link.getObject(object);
-                    }
-                    break;
+            }else{
+                boomLinkDist.normalize();
+                boomLinkDist.multiply(4,4);
+                this.boomerang.x += boomLinkDist.x;
+                this.boomerang.y += boomLinkDist.y;
             }
-            zelda.game.physics.arcade.collide(link, object.collider);
         }
-    });
 
-    //Collide with cofres
-    this.game.physics.arcade.overlap(this, this.level.cofres, function(link, cofre){
-        if(link.zKey.isDown && link.zKey.downDuration(1) && link.canGetObject){
-            cofre.frame = 1;
-        }
-        zelda.game.physics.arcade.collide(link, cofre.collider);
-    });
+        if(this.zKey.isUp) this.canGetObject = true;
 
-    //Overlap with exit
-    this.game.physics.arcade.overlap(this, this.level.exit, function(link, exit){
-        //zelda.game.state.start('world');
-        if(this.level == zelda.world){
-            if(!this.falling){
-                this.falling = true;
-                this.visible = false;
-                var fallSprite = this.game.add.sprite(exit.centerX,exit.centerY,'fall_entrance');
-                fallSprite.anchor.setTo(0.5);
-                var fallAnim = fallSprite.animations.add('fall_anim',[0,1,2,3,4],4,false);
-                fallAnim.onComplete.add(function(){ exit.go(); },this);
-                fallSprite.animations.play('fall_anim');
+        if(this.object != null){
+            if(this.object.state == 1){
+                this.object.position.setTo(this.position.x-this.object.width/2, this.position.y-this.height);
+            }else if(Math.abs(this.object.x - this.x)+Math.abs(this.object.y - this.y) > this.width*4){
+                //Pintar efecto de destruccion
+                this.object.kill();
+                this.object = null;
             }
-        }else{
-//            console.log('toWorld');
-            exit.go();
         }
-        
-        
-        
-    },null, this);
-    
-    if(this.health == 0){
-        this.game.state.restart();
+
+        if(!this.attacking){
+            this.movement();
+            if(((this.zKey.isDown && this.zKey.downDuration(1)) || (this.xKey.isDown && this.xKey.downDuration(1))) && this.object != null && this.object.state == 1){
+                this.throwObject();
+                this.canGetObject = false;
+            }else if(this.xKey.isDown && this.xKey.downDuration(1)){
+                this.attack();
+            }
+        }
+
+        //Collide with walls
+        this.game.physics.arcade.collide(this, this.level.walls);
+
+        //Collide with objects
+        this.game.physics.arcade.overlap(this, this.level.objects, function(link, object){
+            if(object.state == 0){
+                switch(link.direction){
+                    case 3:
+                        if(object.body.hitTest(link.x, link.y+link.height/2)){
+                            link.getObject(object);
+                        }
+                        break;
+                    case 10:
+                        if(object.body.hitTest(link.x, link.y-link.height/4)){
+                            link.getObject(object);
+                        }
+                        break;
+                    case 17:
+                        if(object.body.hitTest(link.x+link.width/2, link.y)){
+                            link.getObject(object);
+                        }
+                        break;
+                    case 24:
+                        if(object.body.hitTest(link.x-link.width/2, link.y)) {
+                            link.getObject(object);
+                        }
+                        break;
+                }
+                zelda.game.physics.arcade.collide(link, object.collider);
+            }
+        });
+
+        //Collide with cofres
+        this.game.physics.arcade.overlap(this, this.level.cofres, function(link, cofre){
+            if(link.zKey.isDown && link.zKey.downDuration(1) && link.canGetObject){
+                cofre.frame = 1;
+            }
+            zelda.game.physics.arcade.collide(link, cofre.collider);
+        });
+
+        //Overlap with exit
+        this.game.physics.arcade.overlap(this, this.level.exit, function(link, exit){
+            //zelda.game.state.start('world');
+            if(this.level == zelda.world){
+                if(!this.falling){
+                    this.falling = true;
+                    this.visible = false;
+                    var fallSprite = this.game.add.sprite(exit.centerX,exit.centerY,'fall_entrance');
+                    fallSprite.anchor.setTo(0.5);
+                    var fallAnim = fallSprite.animations.add('fall_anim',[0,1,2,3,4],4,false);
+                    fallAnim.onComplete.add(function(){ exit.go(); },this);
+                    fallSprite.animations.play('fall_anim');
+                }
+            }else{
+    //            console.log('toWorld');
+                exit.go();
+            }
+
+        },null, this);
     }
+//    if(this.health == 0){
+//        this.game.state.restart();
+//    }
         
 }
 
@@ -243,7 +242,6 @@ zelda.link_prefab.prototype.movement = function(){
 }
 
 zelda.link_prefab.prototype.attack = function(){
-    this.die();
     if(this.canMove){
         this.attacking = true;
         this.body.velocity.setTo(0, 0);
@@ -418,7 +416,7 @@ zelda.link_prefab.prototype.getHit = function(enemy){
     this.health = this.health-enemy.damage;//perd vida
     this.getHitSound.play(); //sound
     if(this.health <= 0){
-        this.die();
+        this.die(enemy);
     }else{
         this.invulnerable = true;
         //tween fade with bucle
@@ -437,31 +435,28 @@ zelda.link_prefab.prototype.getHit = function(enemy){
     }
 }
 
-zelda.link_prefab.prototype.die = function(){
-//    this.animations.stop();
-//    this.visible = false;
-//    this.deathSpriteAux.x = this.x;
-//    this.deathSpriteAux.y = this.y;
-//    this.deathSpriteAux.anchor.setTo(.5);
-//    this.deathSpriteAux.animations.play('voltesAlMorir',10);
-    this.animations.play('voltesAlMorir',10);
-    console.log(this.animations.currentAnim.isPlaying);
-    
+zelda.link_prefab.prototype.die = function(enemy){
+    this.animations.stop();
+    enemy.destroy();
     this.linkDyingSound.play();
-
-//    var deathSprite = this.game.add.sprite(this.centerX,this.centerY,'link_death');
-//    deathSprite.visible =false;
-//    deathSprite.anchor.setTo(.5);
-//    var deathAnim = deathSprite.animations.add('link_dying',[0,1],2);
-//    deathAnim.onComplete.add(function(){
-//        this.reset((256+512-64),(256+1024+16));
-//        this.health = this.hearts*2;
-//    },this);
+    var curtain = this.game.add.sprite(0,0,'bCurtain');
+    curtain.fixedToCamera = true;
+    this.bringToTop();
+    this.animations.play('voltesAlMorir').onComplete.addOnce(function(){
+        this.visible = false;
+        var deathSprite = this.game.add.sprite(this.centerX,this.centerY,'link_death');
+        deathSprite.anchor.setTo(0.5);
+        deathSprite.animations.add('link_dying',[0,1],2).play('link_dying')
+            .onComplete.addOnce(function(){
+            //game over sprite
+            //signal onPressed
+            this.reset((256+512-64),(256+1024+16));
+            this.health = this.hearts*2;
+            curtain.destroy();
+            deathSprite.destroy();
+            this.visible = true;
+            this.game.state.restart();
+        },this);
+    },this);
     
-    
-//    onComplete.add(function(){
-//            this.visible = false;
-//        deathSprite.visible = true;
-//            deathSprite.animations.play('link_dying');
-//        },this);
 }
