@@ -32,7 +32,7 @@ zelda.enemySoldier_prefab = function(game, x, y, level){
     
 
 //    SOUND
-//    this.pickRupeeSound = game.add.audio('rupeeSound',gameOptions.volume);
+    this.sprintSound = game.add.audio('enemySprintSound',gameOptions.volume);
     //so hit, run, death
     
 };
@@ -55,6 +55,7 @@ zelda.enemySoldier_prefab.prototype.update = function(){
         this.state = 'follow';
         this.endMovement = true;
         this.stateTimer = 0;
+        this.sprintSound.play();
     }
     if(distance.getMagnitude() > 90 && this.state == 'follow'){
         this.state = 'search';
@@ -95,7 +96,7 @@ zelda.enemySoldier_prefab.prototype.update = function(){
             break;
         case 'follow':
             this.body.velocity = new Phaser.Point(distance.normalize().x*this.speedRun,distance.normalize().y*this.speedRun);
-            console.log(this.body.velocity);
+//            console.log(this.body.velocity);
             if(Math.abs(this.body.velocity.x >= Math.abs(this.body.velocity.y))){
                 if(this.body.velocity.x >= 0) {this.animations.play('moveRight');}
                 else {this.animations.play('moveLeft');} //esto no lo hace nose porque

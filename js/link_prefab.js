@@ -33,6 +33,10 @@ zelda.link_prefab = function(game, x, y, level){
     this.animations.add('linkWalk_back',[7,8,9,10,11,12,13,12,11,10,9,8],30,true);
     this.animations.add('linkWalk_right',[14,15,16,17,18,19,20,19,18,17,16,15],30,true);
     this.animations.add('linkWalk_left',[21,22,23,24,25,26,27,26,25,24,23,22],30,true);
+    this.animations.add('voltesAlMorir',[3,24,10,17,3,24,10,17,3,24,10,17,3,24,10,17],5);
+    
+//    this.deathSpriteAux = game.add.sprite(-50,-50,'linkWalk_noShield');
+//    this.deathSpriteAux.animations.add('voltesAlMorir',[3,24,10,17,3,24,10,17,3,24,10,17,3,24,10,17],5);
     
     this.falling = false; //animation flag when exit
     
@@ -64,6 +68,9 @@ zelda.link_prefab = function(game, x, y, level){
     this.pauseCloseSound = game.add.audio('closeInventory',gameOptions.volume);
     this.boomerangSound = game.add.audio('boomerangSound',gameOptions.volume,true);
     this.getHitSound = game.add.audio('linkHurt',gameOptions.volume);
+    this.grabObjectSound = game.add.audio('grabObjectSound',gameOptions.volume);
+    this.throwObjectSound= game.add.audio('throwObjectSound',gameOptions.volume);
+    this.linkDyingSound = game.add.audio('linkDyingSound',gameOptions.volume);
     
 };
 
@@ -236,6 +243,7 @@ zelda.link_prefab.prototype.movement = function(){
 }
 
 zelda.link_prefab.prototype.attack = function(){
+    this.die();
     if(this.canMove){
         this.attacking = true;
         this.body.velocity.setTo(0, 0);
@@ -305,20 +313,25 @@ zelda.link_prefab.prototype.attack = function(){
 }
 
 zelda.link_prefab.prototype.generatePickup = function(posX, posY){
-    var item = zelda.game.rnd.between(0,9);
-    if(item >= 6){
+    var item = zelda.game.rnd.between(0,19);
+    if(item >= 1 && item<=5){
         rupee = new zelda.rupee_prefab(this.game, posX, posY, this.level);
         this.game.add.existing(rupee);
     }
-    else if(item >=4 && item <=5){
+    else if(item >=6 && item <=7){
         heart = new zelda.heart_prefab(this.game, posX, posY, this.level);
         this.game.add.existing(heart);
+    }
+    else if(item == 8){
+        powder = new zelda.magicPowder_prefab(this.game, posX, posY, this.level);
+        this.game.add.existing(powder);
     }
 }
 
 zelda.link_prefab.prototype.throwObject = function(){
     if(this.canMove){
         this.object.state = 2;
+        this.throwObjectSound.play();
 
         switch(this.direction){
             case 3: //front=3
@@ -345,6 +358,8 @@ zelda.link_prefab.prototype.getObject = function(object){
         object.state = 1;
         object.bringToTop();
         object.frame = 1;
+        this.grabObjectSound.play();
+        this.generatePickup(object.x+object.width/2,object.y+object.height/2);
     }
 }
 
@@ -400,21 +415,53 @@ zelda.link_prefab.prototype.useItem = function(){
 }
 
 zelda.link_prefab.prototype.getHit = function(enemy){
+    this.health = this.health-enemy.damage;//perd vida
     this.getHitSound.play(); //sound
-    this.invulnerable = true;
-    //tween fade with bucle
-    fadeTween = this.game.add.tween(this);
-    fadeTween.to({alpha: 0},100,null,true,0,5,true);
-    fadeTween.onComplete.addOnce(function(){ this.invulnerable = false;},this);
+    if(this.health <= 0){
+        this.die();
+    }else{
+        this.invulnerable = true;
+        //tween fade with bucle
+        fadeTween = this.game.add.tween(this);
+        fadeTween.to({alpha: 0},100,null,true,0,5,true);
+        fadeTween.onComplete.addOnce(function(){ this.invulnerable = false;},this);
+
+    //    knockbackTween = this.game.add.tween(this);
+    //    knockbackTween.to({x: this.x-50},150,null,true);
+    //    knockbackTween.onUpdateCallback(function(){
+    //        this.game.physics.arcade.overlap(this, this.level.walls,function(a,b){knockbackTween.stop();});
+    //        this.game.physics.arcade.overlap(this, this.level.objects, function(a, b){knockbackTween.stop();});
+    //    },this);
+
+        //move colliding
+    }
+}
+
+zelda.link_prefab.prototype.die = function(){
+//    this.animations.stop();
+//    this.visible = false;
+//    this.deathSpriteAux.x = this.x;
+//    this.deathSpriteAux.y = this.y;
+//    this.deathSpriteAux.anchor.setTo(.5);
+//    this.deathSpriteAux.animations.play('voltesAlMorir',10);
+    this.animations.play('voltesAlMorir',10);
+    console.log(this.animations.currentAnim.isPlaying);
     
-//    knockbackTween = this.game.add.tween(this);
-//    knockbackTween.to({x: this.x-50},150,null,true);
-//    knockbackTween.onUpdateCallback(function(){
-//        this.game.physics.arcade.overlap(this, this.level.walls,function(a,b){knockbackTween.stop();});
-//        this.game.physics.arcade.overlap(this, this.level.objects, function(a, b){knockbackTween.stop();});
+    this.linkDyingSound.play();
+
+//    var deathSprite = this.game.add.sprite(this.centerX,this.centerY,'link_death');
+//    deathSprite.visible =false;
+//    deathSprite.anchor.setTo(.5);
+//    var deathAnim = deathSprite.animations.add('link_dying',[0,1],2);
+//    deathAnim.onComplete.add(function(){
+//        this.reset((256+512-64),(256+1024+16));
+//        this.health = this.hearts*2;
 //    },this);
     
-    //move colliding
-    this.health = this.health-enemy.damage;//perd vida
     
+//    onComplete.add(function(){
+//            this.visible = false;
+//        deathSprite.visible = true;
+//            deathSprite.animations.play('link_dying');
+//        },this);
 }
