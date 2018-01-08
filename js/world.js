@@ -25,6 +25,7 @@ zelda.world = {
         this.load.spritesheet('link_death','img/link_death.png',32,32);
         this.load.spritesheet('enemySoldier','img/enemySoldierRed.png',18,32);
         zelda.game.load.image('bCurtain','img/blackCurtain.png');
+        this.load.image('gameOver','img/gameOver.png');
         
         
         //hud
