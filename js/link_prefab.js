@@ -175,6 +175,10 @@ zelda.link_prefab.prototype.update = function(){
         
         
     },null, this);
+    
+    if(this.health == 0){
+        this.game.state.restart();
+    }
         
 }
 

@@ -1,14 +1,12 @@
 var zelda = zelda || {};
 
-zelda.world = {
+zelda.bossMap = {
     
     init:function(){
         
         zelda.game.world.setBounds(512,1024,512,512);
         this.scale.setUserScale(2,2);
         this.scale.scaleMode = Phaser.ScaleManager.USER_SCALE; //or SHOW_ALL
-        
-        this.game.physics.startSystem(Phaser.Physics.ARCADE);
         
     },
     
@@ -40,21 +38,11 @@ zelda.world = {
         this.load.image('boomerang','img/boomerang.png');
         
         //Tilemap
-        this.load.tilemap('exterior', 'EXTERIOR/exterior.json', null, Phaser.Tilemap.TILED_JSON);
+        this.load.tilemap('bossfight', 'BOSSFIGHT/bossfight.json', null, Phaser.Tilemap.TILED_JSON);
         
         //Patrones tilemap
-        //this.load.image('CasaLink_bush', 'EXTERIOR/patrones/CasaLink_bush.png');
-        this.load.spritesheet('Bushes','EXTERIOR/patrones/Bushes.png',16,16);
-        this.load.spritesheet('Cartel','EXTERIOR/patrones/Cartel.png',16,16);
-        this.load.spritesheet('Exit','EXTERIOR/patrones/Exit.png',16,16);
-        this.load.image('CasaLink_collisions', 'EXTERIOR/patrones/CasaLink_collisions.png');
-        this.load.image('CasaLink_fondo', 'EXTERIOR/patrones/CasaLink_fondo.png');
-        this.load.image('CasaLink_top', 'EXTERIOR/patrones/CasaLink_top.png');
-        //this.load.image('Castillo_bush', 'EXTERIOR/patrones/Castillo_bush.png');
-        //this.load.image('Castillo_collisions', 'EXTERIOR/patrones/Castillo_collisions.png');
-        this.load.image('Castillo_fondo', 'EXTERIOR/patrones/Castillo_fondo.png');
-        this.load.image('Castillo_top', 'EXTERIOR/patrones/Castillo_top.png');
-        this.load.image('LateralCasa_fondo', 'EXTERIOR/patrones/LateralCasa_fondo.png');
+        this.load.image('castle', 'BOSSFIGHT/castle.png');
+        this.load.image('collision', 'BOSSFIGHT/collision.png');
         
         //pickups
         this.load.spritesheet('rupeePickup','img/rupeePickup.png',8,16);
@@ -73,52 +61,16 @@ zelda.world = {
     },
     
     create:function(){
-        //this._bg = zelda.game.add.sprite(0,0,'bg');//----------------------------------------
         
         //Tilemap
-        this.map = this.game.add.tilemap('exterior');
-        //this.map.addTilesetImage('CasaLink_bush');
-        this.map.addTilesetImage('CasaLink_collisions');
-        this.map.addTilesetImage('CasaLink_fondo');
-        this.map.addTilesetImage('CasaLink_top');
-        //this.map.addTilesetImage('Castillo_bush');
-        //this.map.addTilesetImage('Castillo_collisions');
-        this.map.addTilesetImage('Castillo_fondo');
-        this.map.addTilesetImage('Castillo_top');
-        this.map.addTilesetImage('LateralCasa_fondo');
+        this.map = this.game.add.tilemap('bossfight');
+        this.map.addTilesetImage('castle');
+        this.map.addTilesetImage('collision');
         
-        this.walls = this.map.createLayer('collisions2');
-        this.map.setCollisionBetween(4097 ,4097, true, 'collisions2');
+        this.walls = this.map.createLayer('collisions');
+        this.map.setCollisionBetween(23751 ,23751, true, 'collisions');
         
-        //Entrada al castillo
-        this.exit = this.game.add.group();
-        this.map.createFromObjects('exit', 85509, 'Exit', 0, true, false, this.exit);
-        this.exit.forEach(function(out){
-            zelda.game.physics.arcade.enable(out);
-            out.body.immovable = true;
-            out.go = function(){
-                zelda.game.state.start('bossMap');
-            }
-        }, this);
-        
-        this.map.createLayer('fondo_layer');
-        //this.map.createLayer('bushes');
-        
-        //Objetos del exterior
-        this.objects = this.game.add.group();
-        this.map.createFromObjects('objects', 85505, 'Bushes', 0, true, false, this.objects);
-        this.map.createFromObjects('objects', 85507, 'Cartel', 0, true, false, this.objects);
-        this.objects.forEach(function(obj){
-            zelda.game.physics.arcade.enable(obj);
-            obj.body.immovable = true;
-            obj.state = 0; //0 = en suelo, 1 = recogido, 2 = lanzado
-            ////////////////////////////////////////////////////
-            obj.collider = zelda.game.add.sprite(0, 0, null);
-            zelda.game.physics.arcade.enable(obj.collider);
-            obj.collider.body.setSize(obj.width*0.75, obj.height*0.75, obj.x+obj.width*0.125, obj.y+obj.height*0.125);
-            obj.collider.body.immovable = true;
-            ////////////////////////////////////////////////////
-        }, this);
+        this.map.createLayer('fondo');
         
         //Link
         this.link = new zelda.link_prefab(this.game, (256+512-64),(256+1024+16), this);
@@ -126,8 +78,6 @@ zelda.world = {
         
         this.s = new zelda.enemySoldier_prefab(this.game, (256+512)+16*6,(256+1024)+16*3, this);
         this.game.add.existing(this.s);
-        
-        this.map.createLayer('top');//Pinta la layer top por encima de link
         
         //HUD
         this.HUD = this.game.add.group();
@@ -185,15 +135,13 @@ zelda.world = {
         
         if(this.space.isDown && this.space.downDuration(1)){
             console.log(this.camera.position);
-            
-            
         }
-            this.changeZone();
-            this.setHudValues();
-            this.HUD.frame = Number(this.HUD.isInDungeon);
+        
+        this.setHudValues();
+        this.HUD.frame = Number(this.HUD.isInDungeon);
 
-            //inventari
-            this.inventoryManager();
+        //inventari
+        this.inventoryManager();
         
     },
     
@@ -254,72 +202,6 @@ zelda.world = {
         this.fontItemsDisplay.customSpacingX = 1;
         //this.imageFromFont = this.game.add.image(65, 24, this.fontItemsDisplay);
         //this.imageFromFont.fixedToCamera = true;
-        
-    },
-    
-    changeZone:function(){
-        var newLinkZone;
-        var boundsRect = this.world.bounds;
-        
-        
-        //comprova outOfBounds
-        if(this.link.top <= boundsRect.y){
-//            console.log("top collides");
-            this.link.canMove = false;
-            this.camera.target = null;
-            this.world.setBounds(0,0,1024,1536);
-            this.game.add.tween(this.camera)
-                        .to({y: this.camera.y-224},1000,null,true)
-                        .onComplete.add(function() {
-                            arguments[0].follow(this.link);
-                            this.link.canMove = true;
-                            this.world.setBounds(0,0,1024,1024);
-                        },this,this.link);
-            this.game.add.tween(this.link).to({y: this.link.y-this.link.height},500,null,true,200);
-        }
-        else if(this.link.bottom >= boundsRect.y+boundsRect.height){
-//            console.log("bot collides");
-            this.link.canMove = false;
-            this.camera.target = null;
-            this.world.setBounds(0,0,1024,1536);
-            this.game.add.tween(this.camera)
-                        .to({y: this.camera.y+224},1000,null,true)
-                        .onComplete.add(function() {
-                            arguments[0].follow(this.link);
-                            this.link.canMove = true;
-                            if(this.link.x <512) zelda.game.world.setBounds(0,1024,512,512);
-                            else zelda.game.world.setBounds(512,1024,512,512);                            
-                        },this,this.link);
-            this.game.add.tween(this.link).to({y: this.link.y+this.link.height},500,null,true,200);
-        }
-        else if(this.link.right>= boundsRect.x+boundsRect.width){
-//            console.log("right collides");
-            this.link.canMove = false;
-            this.camera.target = null;
-            this.world.setBounds(0,0,1024,1536);
-            this.game.add.tween(this.camera)
-                        .to({x: this.camera.x+256},1000,null,true)
-                        .onComplete.add(function() {
-                            arguments[0].follow(this.link);
-                            this.link.canMove = true;
-                            this.world.setBounds(512,1024,512,512);
-                        },this,this.link);
-            this.game.add.tween(this.link).to({x: this.link.x+this.link.width},500,null,true,200);
-        }
-        else if(this.link.left <= boundsRect.x){
-//            console.log("left collides");
-            this.link.canMove = false;
-            this.camera.target = null;
-            this.world.setBounds(0,0,1024,1536);
-            this.game.add.tween(this.camera)
-                        .to({x: this.camera.x-256},1000,null,true)
-                        .onComplete.add(function() {
-                            arguments[0].follow(this.link);
-                            this.link.canMove = true;
-                            this.world.setBounds(0,1024,512,512);
-                        },this,this.link);
-            this.game.add.tween(this.link).to({x: this.link.x-this.link.width},500,null,true,200);
-        }
         
     },
     
