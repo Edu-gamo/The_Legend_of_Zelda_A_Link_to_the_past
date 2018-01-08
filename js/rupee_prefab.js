@@ -7,7 +7,6 @@ zelda.rupee_prefab = function(game, x, y, level){
     this.animations.add('shine',[0,1,2,3,0,0,0],10,true);
     this.animations.play('shine');
     this.level = level;
-    this.damage = 1;
     
     game.physics.arcade.enable(this);
     this.body.setSize(6,14,1,1);
@@ -27,6 +26,5 @@ zelda.rupee_prefab.prototype.update = function(){
 //            console.log(rupee);
             rupee.pickRupeeSound.play();
             link.rupees++;
-        if(!link.invulnerable) link.getHit(rupee);
         })
 }

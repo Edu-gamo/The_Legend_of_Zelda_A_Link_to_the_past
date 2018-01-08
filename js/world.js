@@ -22,6 +22,7 @@ zelda.world = {
         this.load.spritesheet('attack_back','img/link_ataque_basico_trasero_spritesheet.png',40,60);
         //otros
         this.load.spritesheet('fall_entrance','img/caer_en_foso.png',32,32);
+        this.load.spritesheet('link_death','img/link_death.png',32,32);
         this.load.spritesheet('enemySoldier','img/enemySoldierRed.png',18,32);
         
         
@@ -59,6 +60,7 @@ zelda.world = {
         //pickups
         this.load.spritesheet('rupeePickup','img/rupeePickup.png',8,16);
         this.load.image('heartPickup','img/heartPickup.png');
+        this.load.image('magicPickup','img/magicPickup.png');
         
         //AUDIO
         zelda.game.load.audio('attackSound','audio/LTTP_Sword1.wav');
@@ -70,6 +72,11 @@ zelda.world = {
         zelda.game.load.audio('closeInventory','audio/LTTP_Pause_Close.wav');
         zelda.game.load.audio('boomerangSound','audio/LTTP_Boomerang.wav');
         zelda.game.load.audio('linkHurt','audio/LTTP_Link_Hurt.wav');
+        zelda.game.load.audio('grabObjectSound','audio/LTTP_Link_Pickup.wav');
+        zelda.game.load.audio('throwObjectSound','audio/LTTP_Link_Throw.wav');
+        zelda.game.load.audio('enemySprintSound','audio/LTTP_Enemy_Chase.wav');
+        zelda.game.load.audio('magicPowderSound','audio/LTTP_MagicPowder.wav');
+        zelda.game.load.audio('linkDyingSound','audio/LTTP_Link_Dying.wav');
     },
     
     create:function(){
