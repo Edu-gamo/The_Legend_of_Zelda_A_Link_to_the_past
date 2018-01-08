@@ -7,7 +7,7 @@ zelda.link_prefab = function(game, x, y, level){
     
     game.physics.arcade.enable(this);
     //this.body.collideWorldBounds = true;
-    this.body.setSize(this.width-6, this.height/2-4, 3, this.height/2+2);
+    this.body.setSize(this.width-6, this.height/2-4, 3, this.height/2+1);
     
     this.direction = 3; //front=3,back=10,right=17,left=24;
     this.hasWeapon = false;
@@ -23,6 +23,7 @@ zelda.link_prefab = function(game, x, y, level){
     this.keys = 0;
     this.object = null; //objeto recogido del entorno
     this.throwForce = 150; //velocidad con la que lanza el objeto
+    this.invulnerable = false;
     
     
     //game.load.spritesheet('linkWalk_Shield','img/link_shield_walk_spritesheet.png',23.28,29);
@@ -62,6 +63,7 @@ zelda.link_prefab = function(game, x, y, level){
     this.pauseOpenSound = game.add.audio('openInventory',gameOptions.volume);
     this.pauseCloseSound = game.add.audio('closeInventory',gameOptions.volume);
     this.boomerangSound = game.add.audio('boomerangSound',gameOptions.volume,true);
+    this.getHitSound = game.add.audio('linkHurt',gameOptions.volume);
     
 };
 
@@ -304,6 +306,10 @@ zelda.link_prefab.prototype.generatePickup = function(posX, posY){
         rupee = new zelda.rupee_prefab(this.game, posX, posY, this.level);
         this.game.add.existing(rupee);
     }
+    else if(item >=4 && item <=5){
+        heart = new zelda.heart_prefab(this.game, posX, posY, this.level);
+        this.game.add.existing(heart);
+    }
 }
 
 zelda.link_prefab.prototype.throwObject = function(){
@@ -381,13 +387,30 @@ zelda.link_prefab.prototype.useItem = function(){
                 if(this.direction==24) boomerangTweenPosition.to({x: this.boomerang.x -100},450,null, true,10);
                 boomerangTweenPosition.onComplete.add(function() {
                             this.boomerangReturning = true;
-//                            boomerang.destroy();
-                            //boomerang rady
-//                            this.isBoomerangReady = true;
                         },this);
                 
             }
             
         }
     }
+}
+
+zelda.link_prefab.prototype.getHit = function(enemy){
+    this.getHitSound.play(); //sound
+    this.invulnerable = true;
+    //tween fade with bucle
+    fadeTween = this.game.add.tween(this);
+    fadeTween.to({alpha: 0},100,null,true,0,5,true);
+    fadeTween.onComplete.addOnce(function(){ this.invulnerable = false;},this);
+    
+//    knockbackTween = this.game.add.tween(this);
+//    knockbackTween.to({x: this.x-50},150,null,true);
+//    knockbackTween.onUpdateCallback(function(){
+//        this.game.physics.arcade.overlap(this, this.level.walls,function(a,b){knockbackTween.stop();});
+//        this.game.physics.arcade.overlap(this, this.level.objects, function(a, b){knockbackTween.stop();});
+//    },this);
+    
+    //move colliding
+    this.health = this.health-enemy.damage;//perd vida
+    
 }

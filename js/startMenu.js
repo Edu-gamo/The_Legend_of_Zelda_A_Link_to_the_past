@@ -29,7 +29,7 @@ zelda.menu = {
         
         //AUDIO
         zelda.game.load.audio('musicaMenu','audio/11.select_screen.mp3');
-        zelda.game.load.audio('musicaLevel1','audio/03.time of the falling rain.mp3');
+        zelda.game.load.audio('musicaLevel1','audio/04.overworld.mp3');
         zelda.game.load.audio('menuCursor','audio/LTTP_Menu_Cursor.wav');
         zelda.game.load.audio('selectSound','audio/LTTP_Menu_Select.wav');
         zelda.game.load.audio('selectLetterSound','audio/LTTP_LowHealth.wav');

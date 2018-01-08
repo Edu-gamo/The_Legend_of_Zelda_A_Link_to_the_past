@@ -22,6 +22,7 @@ zelda.world = {
         this.load.spritesheet('attack_back','img/link_ataque_basico_trasero_spritesheet.png',40,60);
         //otros
         this.load.spritesheet('fall_entrance','img/caer_en_foso.png',32,32);
+        this.load.spritesheet('enemySoldier','img/enemySoldierRed.png',18,32);
         
         
         //hud
@@ -68,6 +69,7 @@ zelda.world = {
         zelda.game.load.audio('openInventory','audio/LTTP_Pause_Open.wav');
         zelda.game.load.audio('closeInventory','audio/LTTP_Pause_Close.wav');
         zelda.game.load.audio('boomerangSound','audio/LTTP_Boomerang.wav');
+        zelda.game.load.audio('linkHurt','audio/LTTP_Link_Hurt.wav');
     },
     
     create:function(){
@@ -121,6 +123,9 @@ zelda.world = {
         //Link
         this.link = new zelda.link_prefab(this.game, (256+512-64),(256+1024+16), this);
         this.game.add.existing(this.link);
+        
+        this.s = new zelda.enemySoldier_prefab(this.game, (256+512)+16*6,(256+1024)+16*3, this);
+        this.game.add.existing(this.s);
         
         this.map.createLayer('top');//Pinta la layer top por encima de link
         
