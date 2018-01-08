@@ -4,26 +4,25 @@ zelda.bossMap = {
     
     init:function(){
         
-        zelda.game.world.setBounds(512,1024,512,512);
+        this.game.world.setBounds(-200, -200, gameOptions.gameWidth+200, gameOptions.gameHeight+200); //depen del fondo
+        
         this.scale.setUserScale(2,2);
         this.scale.scaleMode = Phaser.ScaleManager.USER_SCALE; //or SHOW_ALL
         
     },
     
     preload:function(){
-        //LINK
+        
         //walk spritesheets
-        this.load.spritesheet('linkWalk_noShield','img/link_normal_walk_spritesheet.png',23.28,29); this.load.spritesheet('linkWalk_Shield','img/link_shield_walk_spritesheet.png',23.28,29);
+        this.load.spritesheet('linkWalk_noShield','img/link_normal_walk_spritesheet.png',23.28,29);
+        this.load.spritesheet('linkWalk_Shield','img/link_shield_walk_spritesheet.png',23.28,29);
+        
         //attack spritesheets
-        this.load.spritesheet('attack_front','img/link_ataque_basico_frontal_spritesheet.png',39.83,40);
-        this.load.spritesheet('attack_right','img/link_ataque_basico_lateral_spritesheet.png',48,48);
-        this.load.spritesheet('attack_back','img/link_ataque_basico_trasero_spritesheet.png',40,60);
-        //otros
-        this.load.spritesheet('fall_entrance','img/caer_en_foso.png',32,32);
-        this.load.spritesheet('enemySoldier','img/enemySoldierRed.png',18,32);
+        zelda.game.load.spritesheet('attack_front','img/link_ataque_basico_frontal_spritesheet.png',39.83,40);
+        zelda.game.load.spritesheet('attack_right','img/link_ataque_basico_lateral_spritesheet.png',48,48);
+        zelda.game.load.spritesheet('attack_back','img/link_ataque_basico_trasero_spritesheet.png',40,60);
         
-        
-        //hud
+        //HUD sprites
         this.load.spritesheet('HUD','img/HUD_2types.png',256,224);
         this.load.spritesheet('items','img/items.png',16,16); //empty, lampara, boomerang, bomba
         this.load.spritesheet('health','img/hearts.png',7,7,4,0,1);
@@ -38,17 +37,24 @@ zelda.bossMap = {
         this.load.image('boomerang','img/boomerang.png');
         
         //Tilemap
+        //this.load.tilemap('casa_link', 'Interior_CasaLink/casa_link.json', null, Phaser.Tilemap.TILED_JSON);
         this.load.tilemap('bossfight', 'BOSSFIGHT/bossfight.json', null, Phaser.Tilemap.TILED_JSON);
         
         //Patrones tilemap
+        /*this.load.spritesheet('Exit','Interior_CasaLink/patrones/Exit.png',16,16);
+        this.load.spritesheet('spr_cofre','Interior_CasaLink/patrones/spr_cofre.png',16,16);
+        this.load.spritesheet('spr_gerro','Interior_CasaLink/patrones/spr_gerro.png',16,16);
+        this.load.image('Collision','Interior_CasaLink/patrones/Collision.png');
+        this.load.image('fondo', 'Interior_CasaLink/patrones/fondo.png');*/
         this.load.image('castle', 'BOSSFIGHT/castle.png');
         this.load.image('collision', 'BOSSFIGHT/collision.png');
         
         //pickups
         this.load.spritesheet('rupeePickup','img/rupeePickup.png',8,16);
         this.load.image('heartPickup','img/heartPickup.png');
+        this.load.image('magicPickup','img/magicPickup.png');
         
-        //AUDIO
+        //audio
         zelda.game.load.audio('attackSound','audio/LTTP_Sword1.wav');
         zelda.game.load.audio('rupeeSound','audio/LTTP_Rupee1.wav');
         zelda.game.load.audio('pickupItemSound','audio/LTTP_Item.wav');
@@ -58,6 +64,12 @@ zelda.bossMap = {
         zelda.game.load.audio('closeInventory','audio/LTTP_Pause_Close.wav');
         zelda.game.load.audio('boomerangSound','audio/LTTP_Boomerang.wav');
         zelda.game.load.audio('linkHurt','audio/LTTP_Link_Hurt.wav');
+        zelda.game.load.audio('grabObjectSound','audio/LTTP_Link_Pickup.wav');
+        zelda.game.load.audio('throwObjectSound','audio/LTTP_Link_Throw.wav');
+        zelda.game.load.audio('enemySprintSound','audio/LTTP_Enemy_Chase.wav');
+        zelda.game.load.audio('magicPowderSound','audio/LTTP_MagicPowder.wav');
+        zelda.game.load.audio('linkDyingSound','audio/LTTP_Link_Dying.wav');
+        
     },
     
     create:function(){
@@ -70,14 +82,12 @@ zelda.bossMap = {
         this.walls = this.map.createLayer('collisions');
         this.map.setCollisionBetween(23751 ,23751, true, 'collisions');
         
-        this.map.createLayer('fondo');
+        fondo = this.map.createLayer('fondo');
+        fondo.resizeWorld();
         
-        //Link
-        this.link = new zelda.link_prefab(this.game, (256+512-64),(256+1024+16), this);
+        //Link prefab
+        this.link = new zelda.link_prefab(this.game, 255, 100, this);
         this.game.add.existing(this.link);
-        
-        this.s = new zelda.enemySoldier_prefab(this.game, (256+512)+16*6,(256+1024)+16*3, this);
-        this.game.add.existing(this.s);
         
         //HUD
         this.HUD = this.game.add.group();
@@ -104,17 +114,14 @@ zelda.bossMap = {
         this.HUD.add(this.imageFromFont);
         this.HUD.fixedToCamera = true;
         
-        //------------------------------TESTING---------------------------------
-        this.link.checkWorldBounds=true;
-        //this.link.events.onEnterBounds.add(this.changeZone,this);
-        
-        this.space = zelda.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        //--------------------------------
         //inventari
         this.enter = zelda.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
         this.showInventari = false;
         this.INVENTORY = this.game.add.group();
         this.inventory_bg = this.INVENTORY.create(0,-224,'inventari');
+        //this.bombInventory = this.INVENTORY.create(0,0,'items',3); //s'ha de crear i afegir a INVENTORY quan té una bomba
+        //this.lampInventory = this.INVENTORY.create(0,0,'items',1);
+        //this.boomerangInventory = this.INVENTORY.create(0,0,'items',2);
         this.INVENTORY.fixedToCamera = true;
         this.greenCircle = this.INVENTORY.create(32-8,79-224-8,'greenCircle_inv');
 //        this.greenCircle.anchor.setTo(0.5);
@@ -127,24 +134,14 @@ zelda.bossMap = {
         this.cursors = this.game.input.keyboard.createCursorKeys();
         this.itemNameInv = this.INVENTORY.create(168,15-224,'itemName',3);
         
-        
-        
     },
     
     update:function(){
-        
-        if(this.space.isDown && this.space.downDuration(1)){
-            console.log(this.camera.position);
-        }
-        
         this.setHudValues();
         this.HUD.frame = Number(this.HUD.isInDungeon);
-
-        //inventari
         this.inventoryManager();
         
     },
-    
     setHudValues:function(){ //set magic bar, item Selected, number of rupies etc, hp...
         //item
 //        this.item.frame = 0;//this.link.itemSelected;
@@ -206,9 +203,6 @@ zelda.bossMap = {
     },
     
     inventoryManager:function(){
-//        if(this.link.itemSelected == null) this.greenCircle.visible=false;
-//        else this.greenCircle.visible = true;
-        
         if(this.enter.isDown && this.enter.downDuration(1) && !this.game.tweens.isTweening(this.HUD)){
                 
                 if(!this.showInventari){
@@ -218,7 +212,7 @@ zelda.bossMap = {
                     this.HUD.fixedToCamera = false;
                     this.INVENTORY.fixedToCamera = false;
                     this.link.pauseOpenSound.play();
-                    
+
                     //tween de l'inventari i hud
                     this.game.add.tween(this.HUD).to({y: this.HUD.y+224},gameOptions.inventariSpeed,null,true);
                     this.game.add.tween(this.INVENTORY).to({y: this.HUD.y+224},gameOptions.inventariSpeed,null,true);
@@ -254,14 +248,14 @@ zelda.bossMap = {
                     if(this.circleIndex == 3) this.circleIndex = 0;
                     this.greenCircle.animations.stop();
                     this.greenCircle.animations.play('intermitent');
-                    this.link.menuCursorSound.play();
+                     this.link.menuCursorSound.play();
                 }
                 if(this.cursors.left.isDown && this.cursors.left.downDuration(1)){
                     this.circleIndex --;
                     if(this.circleIndex == -1) this.circleIndex = 2;
                     this.greenCircle.animations.stop();
                     this.greenCircle.animations.play('intermitent');
-                    this.link.menuCursorSound.play();
+                     this.link.menuCursorSound.play();
                 }
                 
                 switch(this.circleIndex){
