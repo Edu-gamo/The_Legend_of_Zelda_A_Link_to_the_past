@@ -15,7 +15,7 @@ zelda.link_prefab = function(game, x, y, level){
     this.itemSelected = null; //lamp, boomerang, bomb
     this.itemsAvailable = ["lamp","boomerang","bomb"]; //bomb, lamp, boomerang
     this.hearts = 3;
-    this.health = 6; //cada enter es mig cor
+    this.health = 2; //cada enter es mig cor
     this.magic = 16; //de 0 a 16
     this.rupees = 0;
     this.bombs = 0;
@@ -437,11 +437,14 @@ zelda.link_prefab.prototype.getHit = function(enemy){
 
 zelda.link_prefab.prototype.die = function(enemy){
     this.animations.stop();
+    this.body.velocity = new Phaser.Point(0,0);
+    this.isDead = true;
     enemy.destroy();
     this.linkDyingSound.play();
     var curtain = this.game.add.sprite(0,0,'bCurtain');
     curtain.fixedToCamera = true;
     this.bringToTop();
+    
     this.animations.play('voltesAlMorir').onComplete.addOnce(function(){
         this.visible = false;
         var deathSprite = this.game.add.sprite(this.centerX,this.centerY,'link_death');
@@ -452,6 +455,7 @@ zelda.link_prefab.prototype.die = function(enemy){
             //signal onPressed
             this.reset((256+512-64),(256+1024+16));
             this.health = this.hearts*2;
+            this.isDead = false;
             curtain.destroy();
             deathSprite.destroy();
             this.visible = true;
